@@ -111,8 +111,8 @@ export default function BookForm({
       callApi('/api/recognize-cover', {
         body: form,
         signal,
-        // 서버가 OpenAI를 12초까지 기다리므로 그보다 넉넉하게 잡는다.
-        timeoutMs: 15000,
+        // 서버가 OpenAI를 22초까지 기다리므로 그보다 넉넉하게 잡는다.
+        timeoutMs: 25000,
         // 약속한 모양인지 여기서도 본다. Design Ref: §6
         validate: (data) =>
           typeof data?.title === 'string' && typeof data?.author === 'string',

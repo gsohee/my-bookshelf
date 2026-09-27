@@ -23,7 +23,7 @@
 // Plan SC: S6 기기에 저장되는 사진 0장
 
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { shrinkForUpload } from '@/lib/image';
+import { shrinkForUpload, SHRINK_OPTIONS } from '@/lib/image';
 
 /** 미리보기 주소를 거둬들인다. 없으면 아무 일도 하지 않는다. */
 function revoke(image) {
@@ -41,7 +41,12 @@ export const CAMERA_STATUS = {
   ERROR: 'error',
 };
 
-export function useCameraImage() {
+/**
+ * @param shrinkOptions 줄이기 기준. 본문 글자를 읽을 사진(구절)은
+ *                      `SHRINK_OPTIONS_TEXT`를 넘긴다 — 더 크고 또렷하게 보내야
+ *                      작은 글자가 뭉개지지 않는다.
+ */
+export function useCameraImage(shrinkOptions = SHRINK_OPTIONS) {
   const [image, setImage] = useState(null);
   const [status, setStatus] = useState(CAMERA_STATUS.IDLE);
   const [errorMessage, setErrorMessage] = useState('');
@@ -85,7 +90,7 @@ export function useCameraImage() {
     setStatus(CAMERA_STATUS.SHRINKING);
 
     try {
-      const shrunk = await shrinkForUpload(file);
+      const shrunk = await shrinkForUpload(file, shrinkOptions);
 
       // 줄이는 사이에 다른 사진을 고르거나 지웠다면 이 결과는 버린다.
       if (myTurn !== pickCount.current) return null;
@@ -108,7 +113,8 @@ export function useCameraImage() {
       setErrorMessage('사진을 준비하지 못했어요. 다시 해주세요.');
       return null;
     }
-  }, []);
+    // 넘겨받는 기준은 모듈 상수라 늘 같은 값이다. 이 함수가 새로 만들어지지 않는다.
+  }, [shrinkOptions]);
 
   // 화면을 떠날 때 반드시 버린다.
   // 저장하든 취소하든 뒤로 가든, 결국 이 화면은 사라지므로 여기로 모인다.

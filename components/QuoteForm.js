@@ -29,6 +29,7 @@ import ErrorNote from '@/components/ErrorNote';
 import ConfirmDialog from '@/components/ConfirmDialog';
 import TagInput from '@/components/TagInput';
 import { useCameraImage } from '@/components/useCameraImage';
+import { SHRINK_OPTIONS_TEXT } from '@/lib/image';
 import { useApiCall } from '@/components/useApiCall';
 import { callApi } from '@/lib/api';
 
@@ -64,7 +65,10 @@ export default function QuoteForm({ bookId, quote = null, onDone }) {
   const [saveError, setSaveError] = useState(null);
 
   // 페이지 사진. 메모리에만 있고 저장하지 않는다. Design Ref: §4.7 사진의 수명
-  const photo = useCameraImage();
+  //
+  // 표지보다 **덜 줄여서** 보낸다. 본문은 글자가 작아 세게 줄이면 획이 붙어버리고,
+  // 그러면 모델이 못 읽은 자리를 지어낸다. (lib/image.js SHRINK_OPTIONS_TEXT)
+  const photo = useCameraImage(SHRINK_OPTIONS_TEXT);
   const [photoError, setPhotoError] = useState('');
 
   // 페이지 읽기. 부르는 동안의 상태와 실패 문구를 맡는다. (작업 8)
@@ -130,8 +134,8 @@ export default function QuoteForm({ bookId, quote = null, onDone }) {
       callApi('/api/recognize-quote', {
         body: form,
         signal,
-        // 서버가 OpenAI를 12초까지 기다리므로 그보다 넉넉하게 잡는다.
-        timeoutMs: 15000,
+        // 서버가 OpenAI를 22초까지 기다리므로 그보다 넉넉하게 잡는다.
+        timeoutMs: 25000,
         // 약속한 모양인지 여기서도 본다. Design Ref: §6
         validate: (data) => typeof data?.text === 'string',
       }),
@@ -231,7 +235,7 @@ export default function QuoteForm({ bookId, quote = null, onDone }) {
           */}
           <CameraInput
             label="책 페이지 사진으로 채우기"
-            hint="찍은 사진은 저장하지 않아요"
+            hint="한 쪽만, 그늘 없이, 글자가 화면을 꽉 채우게 찍으면 잘 읽어요. 찍은 사진은 저장하지 않아요"
             image={photo.image}
             status={photo.status}
             recognizing={recognize.loading}

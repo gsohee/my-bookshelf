@@ -19,6 +19,15 @@ import { fail, readImageFromRequest, askVision } from '@/lib/visionApi';
 /** 사진을 다루므로 Node 환경에서 돌린다. */
 export const runtime = 'nodejs';
 
+/**
+ * 서버가 이만큼까지 돌 수 있게 한다. (초)
+ *
+ * Vercel은 적지 않으면 10초에 함수를 끊는다. 자세히 보기(`high`)로 빽빽한 본문을
+ * 읽으면 그보다 오래 걸려, 우리가 정한 22초 제한에 닿기도 전에 잘렸다.
+ * 잘리면 다듬은 안내 대신 서버 오류가 그대로 간다.
+ */
+export const maxDuration = 30;
+
 const FAIL_MESSAGE = '표지에서 제목을 읽지 못했습니다.';
 
 /**
