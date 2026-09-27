@@ -84,8 +84,19 @@ export default function BookDetail({ id }) {
 
   const reads = book.reads ?? [];
   const currentRead = reads[reads.length - 1] ?? {};
-  const rating = currentRead.review?.rating ?? null;
-  const hasReview = currentRead.review != null;
+  const review = currentRead.review ?? null;
+  const rating = review?.rating ?? null;
+  const hasReview = review != null;
+
+  // 적어둔 감상 가운데 별점 말고 보여줄 것이 있는가.
+  // 별점은 위 목록에 이미 한 줄로 나오므로, 그것만 있으면 칸을 따로 만들지 않는다.
+  const likedPoints = Array.isArray(review?.likedPoints)
+    ? review.likedPoints.filter(Boolean)
+    : [];
+  const memo = String(review?.memo ?? '').trim();
+  const hasReviewDetail = Boolean(
+    review?.mood || likedPoints.length > 0 || review?.difficulty || memo,
+  );
   // 아직 끝낼 수 있는 책인가. 일시정지도 다시 집어 들어 끝낼 수 있다. (작업 29)
   const isReadable =
     book.status === BOOK_STATUS.READING || book.status === BOOK_STATUS.PAUSED;
@@ -222,6 +233,55 @@ export default function BookDetail({ id }) {
           </div>
         )}
       </dl>
+
+      {/*
+        남긴 감상
+        완독 화면에서 고른 것들이다. 담기기만 하고 어디에도 보이지 않아
+        "저장이 안 된 것 같다"는 말을 들었다. 적은 사람이 다시 읽을 자리가 있어야 한다.
+        별점은 위 목록에 이미 나오므로 여기서 또 적지 않는다.
+        Design Ref: §3.3③ 책 상세
+      */}
+      {hasReviewDetail && (
+        <div className="mt-5 rounded-xl bg-surface-soft px-4 py-3">
+          <p className="text-xs font-medium text-muted">
+            남긴 감상
+            {reads.length > 1 && ` (${currentRead.round}회차)`}
+          </p>
+
+          <dl className="mt-2 space-y-2 text-sm">
+            {review.mood && (
+              <div className="flex gap-2">
+                <dt className="w-20 shrink-0 text-muted">분위기</dt>
+                <dd className="min-w-0 flex-1 text-ink">{review.mood}</dd>
+              </div>
+            )}
+            {likedPoints.length > 0 && (
+              <div className="flex gap-2">
+                <dt className="w-20 shrink-0 text-muted">좋았던 점</dt>
+                <dd className="min-w-0 flex-1 text-ink">
+                  {likedPoints.join(' · ')}
+                </dd>
+              </div>
+            )}
+            {review.difficulty && (
+              <div className="flex gap-2">
+                <dt className="w-20 shrink-0 text-muted">난이도</dt>
+                <dd className="min-w-0 flex-1 text-ink">{review.difficulty}</dd>
+              </div>
+            )}
+          </dl>
+
+          {/* 메모는 여러 줄일 수 있어 목록 아래에 따로 놓는다. 줄바꿈을 살린다. */}
+          {memo && (
+            <div className="mt-3 border-t border-line-soft pt-3">
+              <p className="text-xs text-muted">메모</p>
+              <p className="mt-1 whitespace-pre-wrap text-sm leading-6 text-ink">
+                {memo}
+              </p>
+            </div>
+          )}
+        </div>
+      )}
 
       {/*
         지난 회차 (작업 30)
