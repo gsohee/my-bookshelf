@@ -15,10 +15,8 @@
 import { useState } from 'react';
 import { useBooks } from '@/components/BookStore';
 import { addToRead, getToRead, describeStorageError } from '@/lib/storage';
+import { titleKey } from '@/lib/titleKey';
 import ErrorNote from '@/components/ErrorNote';
-
-/** 띄어쓰기와 대소문자를 무시하고 견주기 위해 납작하게 만든다. */
-const flatten = (s) => String(s ?? '').replace(/\s+/g, '').toLowerCase();
 
 /**
  * 화면에 보여줄 권수. PRD N1이 3권으로 정했다.
@@ -38,17 +36,17 @@ export default function RecommendList({ books, emptyTitle, emptyDescription }) {
 
   // 서재에 이미 있는 책을 먼저 빼고, 그다음에 3권을 고른다.
   // 순서가 반대면 고른 3권 중 하나가 서재에 있을 때 2권만 남는다.
-  const inShelf = new Set(shelf.map((item) => flatten(item.title)));
+  const inShelf = new Set(shelf.map((item) => titleKey(item.title)));
   const shown = (books ?? [])
-    .filter((item) => !inShelf.has(flatten(item.title)))
+    .filter((item) => !inShelf.has(titleKey(item.title)))
     .slice(0, SHOW_COUNT);
 
   /** 이미 읽을 책에 담긴 것인지. 새로고침해도 알 수 있도록 저장소에서 확인한다. */
   function alreadySaved(item) {
-    const key = flatten(item.title);
+    const key = titleKey(item.title);
     if (savedKeys.includes(key)) return true;
     try {
-      return getToRead().some((saved) => flatten(saved.title) === key);
+      return getToRead().some((saved) => titleKey(saved.title) === key);
     } catch {
       return false;
     }
@@ -57,7 +55,7 @@ export default function RecommendList({ books, emptyTitle, emptyDescription }) {
   function handleSave(item) {
     try {
       addToRead(item);
-      setSavedKeys((current) => [...current, flatten(item.title)]);
+      setSavedKeys((current) => [...current, titleKey(item.title)]);
       setSaveError(null);
     } catch (error) {
       // 원문 오류를 그대로 보여주지 않는다. Design Ref: §8 오류 처리

@@ -24,6 +24,7 @@
 // Design Ref: §4.4 흐름 3 — 완독 → 추천
 
 import { fail, askOpenAI } from '@/lib/openaiApi';
+import { titleKey } from '@/lib/titleKey';
 
 export const runtime = 'nodejs';
 
@@ -181,9 +182,6 @@ function buildPromptMessage(prompt) {
   return ['읽고 싶은 책에 대해 이렇게 적었습니다.', '', prompt].join('\n');
 }
 
-/** 띄어쓰기와 대소문자를 무시하고 견주기 위해 납작하게 만든다. */
-const flatten = (s) => String(s ?? '').replace(/\s+/g, '').toLowerCase();
-
 /** 서재 목록을 받기로 한 모양으로만 추린다. 다른 것이 섞여 와도 내보내지 않는다. */
 function readShelf(raw) {
   if (!Array.isArray(raw)) return [];
@@ -279,7 +277,7 @@ export async function POST(request) {
   }
 
   // 모양이 어긋난 것, 빼기로 한 책, 같은 책이 두 번 온 것을 걸러낸다.
-  const excluded = new Set(excludeTitles.map(flatten));
+  const excluded = new Set(excludeTitles.map(titleKey));
   const seen = new Set();
   const books = [];
   for (const item of raw) {
@@ -289,9 +287,9 @@ export async function POST(request) {
 
     if (bookTitle === '' || bookAuthor === '') continue;
 
-    const key = `${flatten(bookTitle)}|${flatten(bookAuthor)}`;
+    const key = `${titleKey(bookTitle)}|${titleKey(bookAuthor)}`;
     if (seen.has(key)) continue;
-    if (excluded.has(flatten(bookTitle))) continue;
+    if (excluded.has(titleKey(bookTitle))) continue;
 
     seen.add(key);
     books.push({ title: bookTitle, author: bookAuthor, reason });
