@@ -2,8 +2,11 @@
 
 // 읽을 책
 //
-// 완독 뒤 추천에서 담아둔 책들이다. "읽기 시작"을 누르면 새 책 등록 폼으로
+// 추천에서 담아둔 책들이다. "읽기 시작"을 누르면 새 책 등록 폼으로
 // 제목과 지은이가 채워진 채 넘어간다 — 다시 타이핑하지 않아도 되도록.
+//
+// 추천은 완독한 뒤에만 받을 수 있던 것을, 서재를 보거나 직접 적어서도
+// 받을 수 있게 했다(작업 44). 그 입구를 여기 둔다 — 받은 책이 이 목록에 쌓이므로.
 //
 // 뭐부터 읽을지 고르기 어려울 때를 위해 **랜덤 뽑기**가 있다. (작업 41)
 // 고르는 일 자체가 미루는 이유가 되지 않게 하려는 것이다.
@@ -70,7 +73,9 @@ export default function ToReadList() {
     return (
       <EmptyState
         title="아직 저장한 책이 없어요."
-        description="책을 다 읽으면 추천을 받을 수 있어요."
+        description="서재를 보고 고르거나, 읽고 싶은 책을 적어서 추천받을 수 있어요."
+        actionLabel="추천 받기"
+        actionHref="/to-read/recommend"
       />
     );
   }
@@ -78,19 +83,28 @@ export default function ToReadList() {
   return (
     <div className="flex flex-1 flex-col">
       <div className="mb-3 flex items-center justify-between gap-2">
-        <p className="text-xs text-muted">
+        <p className="shrink-0 text-xs text-muted">
           {sorted.length}권
         </p>
-        {/* 랜덤 뽑기 (작업 41) — 한 권뿐이면 고를 것이 없어 숨긴다 */}
-        {sorted.length > 1 && (
-          <button
-            type="button"
-            onClick={draw}
+        <div className="flex items-center gap-1.5">
+          {/* 랜덤 뽑기 (작업 41) — 한 권뿐이면 고를 것이 없어 숨긴다 */}
+          {sorted.length > 1 && (
+            <button
+              type="button"
+              onClick={draw}
+              className="rounded-full border border-line px-3 py-1.5 text-xs text-muted"
+            >
+              🎲 하나 뽑기
+            </button>
+          )}
+          {/* 완독하지 않아도 추천을 받는 입구 (작업 44) */}
+          <Link
+            href="/to-read/recommend"
             className="rounded-full border border-line px-3 py-1.5 text-xs text-muted"
           >
-            🎲 하나 뽑기
-          </button>
-        )}
+            ✨ 추천 받기
+          </Link>
+        </div>
       </div>
 
       {/* 뽑은 책을 맨 위에 보여준다. 목록을 눈으로 찾게 하지 않는다 */}

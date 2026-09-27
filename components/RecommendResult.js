@@ -1,14 +1,12 @@
 'use client';
 
-// 추천 결과
+// 추천 결과 — 완독 뒤
 //
 // 화면에 들어서면 곧바로 추천을 받아 온다. 감상 화면에서 "추천 받기"를 이미 눌렀으므로
 // 여기서 또 누르게 하지 않는다.
 //
-// 지키는 것 두 가지
-//   1. "AI 추천이므로 실제 도서 여부를 확인하세요"를 늘 보여준다 (PRD N1)
-//   2. 서재에 이미 있는 책은 빼고 보여준다 — 서재는 이 기기에만 있으므로
-//      서버가 아니라 여기서 거른다 (PRD 6절)
+// 받은 책을 보여주고 저장을 받는 일은 `RecommendList`가 맡는다 —
+// 서재·직접 입력 추천(작업 44)과 똑같은 모양이어야 하기 때문이다.
 //
 // 받은 추천은 그대로 저장되지 않는다. "읽을 책에 저장"은 사람이 누른다.
 //
@@ -21,17 +19,8 @@ import { useRouter } from 'next/navigation';
 import { useBooks, useHydrated } from '@/components/BookStore';
 import { useApiCall } from '@/components/useApiCall';
 import { callApi } from '@/lib/api';
-import { addToRead, getToRead, describeStorageError } from '@/lib/storage';
-import ErrorNote from '@/components/ErrorNote';
-
-/** 띄어쓰기와 대소문자를 무시하고 견주기 위해 납작하게 만든다. */
-const flatten = (s) => String(s ?? '').replace(/\s+/g, '').toLowerCase();
-
-/**
- * 화면에 보여줄 권수. PRD N1이 3권으로 정했다.
- * 서재에 있는 책을 뺀 다음에 세어야 늘 3권이 채워진다.
- */
-const SHOW_COUNT = 3;
+import RecommendList from '@/components/RecommendList';
+import RecommendNotice from '@/components/RecommendNotice';
 
 export default function RecommendResult({ bookId }) {
   const router = useRouter();
@@ -40,8 +29,6 @@ export default function RecommendResult({ bookId }) {
   const recommend = useApiCall();
 
   const [received, setReceived] = useState(null);
-  const [savedKeys, setSavedKeys] = useState([]);
-  const [saveError, setSaveError] = useState(null);
 
   const book = books.find((item) => item.id === bookId);
   const review = book?.reads?.[book.reads.length - 1]?.review ?? null;
@@ -71,6 +58,7 @@ export default function RecommendResult({ bookId }) {
           validate: (result) => Array.isArray(result?.books),
           // 보내는 것은 여기 적힌 것뿐이다. 구절과 메모는 넣지 않는다. (PRD 7절)
           body: {
+            mode: 'book',
             title: book.title,
             genre: book.genre,
             mood: review?.mood ?? '',
@@ -110,37 +98,6 @@ export default function RecommendResult({ bookId }) {
     );
   }
 
-  // 서재에 이미 있는 책을 먼저 빼고, 그다음에 3권을 고른다.
-  // 순서가 반대면 고른 3권 중 하나가 서재에 있을 때 2권만 남는다.
-  const inShelf = new Set(books.map((item) => flatten(item.title)));
-  const shown = (received ?? [])
-    .filter((item) => !inShelf.has(flatten(item.title)))
-    .slice(0, SHOW_COUNT);
-
-  /** 이미 읽을 책에 담긴 것인지. 새로고침해도 알 수 있도록 저장소에서 확인한다. */
-  function alreadySaved(item) {
-    const key = flatten(item.title);
-    if (savedKeys.includes(key)) return true;
-    try {
-      return getToRead().some((saved) => flatten(saved.title) === key);
-    } catch {
-      return false;
-    }
-  }
-
-  function handleSave(item) {
-    try {
-      addToRead(item);
-      setSavedKeys((current) => [...current, flatten(item.title)]);
-      setSaveError(null);
-    } catch (error) {
-      // 원문 오류를 그대로 보여주지 않는다. Design Ref: §8 오류 처리
-      setSaveError(
-        describeStorageError(error, '저장하지 못했어요. 잠시 후 다시 해주세요.'),
-      );
-    }
-  }
-
   function goBack() {
     router.push(`/books/${bookId}`);
   }
@@ -151,13 +108,7 @@ export default function RecommendResult({ bookId }) {
         『{book.title}』을(를) 읽은 뒤에 어울리는 책이에요
       </p>
 
-      {/*
-        PRD N1이 못박은 문구. 추천이 나오든 안 나오든 늘 보인다.
-        AI가 없는 책을 지어낼 수 있기 때문이다.
-      */}
-      <p className="rounded-lg bg-warn-bg px-3 py-2.5 text-xs leading-5 text-warn-text">
-        ⚠ AI 추천이므로 실제 도서 여부를 확인하세요.
-      </p>
+      <RecommendNotice />
 
       {recommend.loading && (
         <div className="flex flex-1 flex-col items-center justify-center gap-1 text-center">
@@ -203,52 +154,11 @@ export default function RecommendResult({ bookId }) {
 
       {!recommend.loading && !recommend.errorMessage && received !== null && (
         <>
-          {shown.length === 0 ? (
-            <div className="flex flex-1 flex-col items-center justify-center gap-2 text-center">
-              <p className="text-sm text-muted">
-                권해줄 만한 새 책을 찾지 못했어요.
-              </p>
-              <p className="text-xs text-faint">
-                추천된 책이 이미 서재에 있을 수 있어요.
-              </p>
-            </div>
-          ) : (
-            <ul className="flex flex-col gap-3">
-              {shown.map((item) => {
-                const saved = alreadySaved(item);
-                return (
-                  <li
-                    key={`${item.title}|${item.author}`}
-                    className="rounded-xl border border-line-soft p-3"
-                  >
-                    <p className="text-sm font-semibold text-ink">
-                      {item.title}
-                    </p>
-                    <p className="mt-0.5 text-xs text-muted">
-                      {item.author}
-                    </p>
-                    {item.reason && (
-                      <p className="mt-2 text-sm leading-6 text-muted">
-                        {item.reason}
-                      </p>
-                    )}
-                    <div className="mt-3 flex justify-end">
-                      <button
-                        type="button"
-                        onClick={() => handleSave(item)}
-                        disabled={saved}
-                        className="rounded-full border border-line px-4 py-2 text-sm text-muted disabled:border-transparent disabled:bg-surface-soft disabled:text-faint"
-                      >
-                        {saved ? '저장됨' : '읽을 책에 저장'}
-                      </button>
-                    </div>
-                  </li>
-                );
-              })}
-            </ul>
-          )}
-
-          <ErrorNote message={saveError?.message} code={saveError?.code} />
+          <RecommendList
+            books={received}
+            emptyTitle="권해줄 만한 새 책을 찾지 못했어요."
+            emptyDescription="추천된 책이 이미 서재에 있을 수 있어요."
+          />
 
           <button
             type="button"

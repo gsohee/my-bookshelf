@@ -49,6 +49,8 @@ function screenTitle(pathname, activeTab) {
   if (pathname.endsWith('/quotes/new')) return '구절 추가';
   if (pathname.endsWith('/finish')) return '다 읽었어요!';
   if (pathname.endsWith('/finish/result')) return '이런 책은 어때요?';
+  // 완독하지 않고 받는 추천 (작업 44). 읽을 책 탭에 속한다.
+  if (pathname === '/to-read/recommend') return '책 추천 받기';
 
   const isBookDetail =
     pathname.startsWith('/books/') && pathname !== '/books/new';
