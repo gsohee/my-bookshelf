@@ -38,6 +38,83 @@ function joinParts(parts) {
 }
 
 /**
+ * 감상에서 **별점 말고** 보여줄 것을 추려낸다.
+ *
+ * 넷 다 비어 있으면 null을 돌려준다 — 부르는 쪽이 이것으로 칸을 만들지 말지 정한다.
+ * 별점은 빼둔다. 이번 회차는 위 목록에, 지난 회차는 날짜 줄에 이미 나오기 때문이다.
+ */
+function reviewDetailOf(review) {
+  if (!review) return null;
+
+  const mood = String(review.mood ?? '').trim();
+  const difficulty = String(review.difficulty ?? '').trim();
+  const memo = String(review.memo ?? '').trim();
+  const likedPoints = Array.isArray(review.likedPoints)
+    ? review.likedPoints.filter(Boolean)
+    : [];
+
+  // 적은 날만 있고 고른 것이 없으면 칸을 열지 않는다.
+  // 날짜 한 줄 때문에 칸을 만들면 별점만 매긴 책이 괜히 길어진다.
+  if (!mood && !difficulty && !memo && likedPoints.length === 0) return null;
+
+  // 감상을 적은 날. 4번째 저장 구조부터 담긴다.
+  // 그 전에 적은 감상에는 없으므로(null) 그때는 줄을 띄우지 않는다.
+  const savedAt = String(review.savedAt ?? '').trim();
+  return { mood, likedPoints, difficulty, memo, savedAt };
+}
+
+/**
+ * 감상 한 벌 — 분위기 · 좋았던 점 · 난이도 · 메모.
+ *
+ * 이번 회차(「남긴 감상」 칸)와 지난 회차(「읽은 기록」에서 펼쳤을 때)가 함께 쓴다.
+ * 두 곳이 다른 모양이면 같은 것을 보는데 다르게 읽힌다.
+ */
+function ReviewDetail({ detail }) {
+  return (
+    <>
+      <dl className="space-y-2 text-sm">
+        {detail.mood && (
+          <div className="flex gap-2">
+            <dt className="w-20 shrink-0 text-muted">분위기</dt>
+            <dd className="min-w-0 flex-1 text-ink">{detail.mood}</dd>
+          </div>
+        )}
+        {detail.likedPoints.length > 0 && (
+          <div className="flex gap-2">
+            <dt className="w-20 shrink-0 text-muted">좋았던 점</dt>
+            <dd className="min-w-0 flex-1 text-ink">
+              {detail.likedPoints.join(' · ')}
+            </dd>
+          </div>
+        )}
+        {detail.difficulty && (
+          <div className="flex gap-2">
+            <dt className="w-20 shrink-0 text-muted">난이도</dt>
+            <dd className="min-w-0 flex-1 text-ink">{detail.difficulty}</dd>
+          </div>
+        )}
+        {detail.savedAt && (
+          <div className="flex gap-2">
+            <dt className="w-20 shrink-0 text-muted">적은 날</dt>
+            <dd className="min-w-0 flex-1 text-ink">{detail.savedAt}</dd>
+          </div>
+        )}
+      </dl>
+
+      {/* 메모는 여러 줄일 수 있어 목록 아래에 따로 놓는다. 줄바꿈을 살린다. */}
+      {detail.memo && (
+        <div className="mt-3 border-t border-line-soft pt-3">
+          <p className="text-xs text-muted">메모</p>
+          <p className="mt-1 whitespace-pre-wrap text-sm leading-6 text-ink">
+            {detail.memo}
+          </p>
+        </div>
+      )}
+    </>
+  );
+}
+
+/**
  * 완독일이 없을 때 그 자리에 적을 말. 상태마다 뜻이 다르다. (작업 29)
  * 중단한 책에 "아직 읽는 중"이라고 적으면 사실과 다르다.
  */
@@ -88,15 +165,8 @@ export default function BookDetail({ id }) {
   const rating = review?.rating ?? null;
   const hasReview = review != null;
 
-  // 적어둔 감상 가운데 별점 말고 보여줄 것이 있는가.
-  // 별점은 위 목록에 이미 한 줄로 나오므로, 그것만 있으면 칸을 따로 만들지 않는다.
-  const likedPoints = Array.isArray(review?.likedPoints)
-    ? review.likedPoints.filter(Boolean)
-    : [];
-  const memo = String(review?.memo ?? '').trim();
-  const hasReviewDetail = Boolean(
-    review?.mood || likedPoints.length > 0 || review?.difficulty || memo,
-  );
+  // 이번 회차 감상에서 별점 말고 보여줄 것. 없으면 null이라 칸을 만들지 않는다.
+  const reviewDetail = reviewDetailOf(review);
   // 아직 끝낼 수 있는 책인가. 일시정지도 다시 집어 들어 끝낼 수 있다. (작업 29)
   const isReadable =
     book.status === BOOK_STATUS.READING || book.status === BOOK_STATUS.PAUSED;
@@ -241,45 +311,13 @@ export default function BookDetail({ id }) {
         별점은 위 목록에 이미 나오므로 여기서 또 적지 않는다.
         Design Ref: §3.3③ 책 상세
       */}
-      {hasReviewDetail && (
+      {reviewDetail && (
         <div className="mt-5 rounded-xl bg-surface-soft px-4 py-3">
-          <p className="text-xs font-medium text-muted">
+          <p className="mb-2 text-xs font-medium text-muted">
             남긴 감상
             {reads.length > 1 && ` (${currentRead.round}회차)`}
           </p>
-
-          <dl className="mt-2 space-y-2 text-sm">
-            {review.mood && (
-              <div className="flex gap-2">
-                <dt className="w-20 shrink-0 text-muted">분위기</dt>
-                <dd className="min-w-0 flex-1 text-ink">{review.mood}</dd>
-              </div>
-            )}
-            {likedPoints.length > 0 && (
-              <div className="flex gap-2">
-                <dt className="w-20 shrink-0 text-muted">좋았던 점</dt>
-                <dd className="min-w-0 flex-1 text-ink">
-                  {likedPoints.join(' · ')}
-                </dd>
-              </div>
-            )}
-            {review.difficulty && (
-              <div className="flex gap-2">
-                <dt className="w-20 shrink-0 text-muted">난이도</dt>
-                <dd className="min-w-0 flex-1 text-ink">{review.difficulty}</dd>
-              </div>
-            )}
-          </dl>
-
-          {/* 메모는 여러 줄일 수 있어 목록 아래에 따로 놓는다. 줄바꿈을 살린다. */}
-          {memo && (
-            <div className="mt-3 border-t border-line-soft pt-3">
-              <p className="text-xs text-muted">메모</p>
-              <p className="mt-1 whitespace-pre-wrap text-sm leading-6 text-ink">
-                {memo}
-              </p>
-            </div>
-          )}
+          <ReviewDetail detail={reviewDetail} />
         </div>
       )}
 
@@ -295,25 +333,65 @@ export default function BookDetail({ id }) {
             읽은 기록 {reads.length}회
           </p>
           <ul className="mt-2 space-y-1.5 text-sm">
-            {[...reads].reverse().map((read) => (
-              <li key={read.round} className="flex gap-2">
-                <span className="w-12 shrink-0 text-muted">
-                  {read.round}회차
-                </span>
-                <span className="min-w-0 flex-1 text-ink">
-                  {joinParts([
-                    // 끝나지 않은 회차는 마지막 하나뿐이다. 거기에만 상태를 적는다.
-                    `${read.startedAt ?? '—'} ~ ${
-                      read.finishedAt ??
-                      (read.round === currentRead.round
-                        ? notFinishedLabel(book.status)
-                        : '—')
-                    }`,
-                    formatRating(read.review?.rating),
-                  ])}
-                </span>
-              </li>
-            ))}
+            {[...reads].reverse().map((read) => {
+              const line = joinParts([
+                // 끝나지 않은 회차는 마지막 하나뿐이다. 거기에만 상태를 적는다.
+                `${read.startedAt ?? '—'} ~ ${
+                  read.finishedAt ??
+                  (read.round === currentRead.round
+                    ? notFinishedLabel(book.status)
+                    : '—')
+                }`,
+                formatRating(read.review?.rating),
+              ]);
+
+              // 이번 회차 감상은 위 「남긴 감상」에 이미 펼쳐져 있으므로 여기서 또 접었다 펴지 않는다.
+              const isCurrent = read.round === currentRead.round;
+              const pastDetail = isCurrent ? null : reviewDetailOf(read.review);
+
+              if (!pastDetail) {
+                return (
+                  <li key={read.round} className="flex gap-2">
+                    <span className="w-12 shrink-0 text-muted">
+                      {read.round}회차
+                    </span>
+                    <span className="min-w-0 flex-1 text-ink">{line}</span>
+                  </li>
+                );
+              }
+
+              return (
+                <li key={read.round}>
+                  {/*
+                    지난 회차 감상 펼쳐보기.
+                    `<details>`를 쓰면 상태를 따로 들지 않아도 되고,
+                    읽어주는 도구에도 "펼침/접힘"이 그대로 전해진다.
+                    사파리가 기본으로 그리는 삼각형은 지우고 우리 화살표를 쓴다.
+                  */}
+                  <details className="group">
+                    <summary className="flex cursor-pointer list-none items-center gap-2 [&::-webkit-details-marker]:hidden">
+                      <span className="w-12 shrink-0 text-muted">
+                        {read.round}회차
+                      </span>
+                      <span className="min-w-0 flex-1 text-ink">{line}</span>
+                      <span className="shrink-0 text-xs text-muted">
+                        감상
+                        <span
+                          aria-hidden="true"
+                          className="ml-0.5 inline-block transition-transform group-open:rotate-180"
+                        >
+                          ▾
+                        </span>
+                      </span>
+                    </summary>
+
+                    <div className="mt-2 rounded-lg bg-surface px-3 py-2.5">
+                      <ReviewDetail detail={pastDetail} />
+                    </div>
+                  </details>
+                </li>
+              );
+            })}
           </ul>
         </div>
       )}
