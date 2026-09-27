@@ -31,14 +31,15 @@ import { todayKST } from '@/lib/date';
 import ConfirmDialog from '@/components/ConfirmDialog';
 import ErrorNote from '@/components/ErrorNote';
 import CameraInput from '@/components/CameraInput';
+import BookSearch from '@/components/BookSearch';
 import { useCameraImage } from '@/components/useCameraImage';
 import { useApiCall } from '@/components/useApiCall';
 import { callApi } from '@/lib/api';
 import { notifyBooksChanged } from '@/components/BookStore';
 
-const labelClass = 'block text-sm font-medium text-zinc-700 dark:text-zinc-300';
+const labelClass = 'block text-sm font-medium text-muted';
 const inputClass =
-  'mt-1 w-full rounded-lg border border-black/15 bg-white px-3 py-2 text-base text-black outline-none focus:border-black dark:border-white/20 dark:bg-black dark:text-zinc-50 dark:focus:border-zinc-300';
+  'mt-1 w-full rounded-lg border border-line bg-surface px-3 py-2 text-base text-ink outline-none focus:border-brand';
 
 /** 책에서 마지막 회차를 꺼낸다. 없으면 빈 회차로 본다. */
 function lastRead(book) {
@@ -141,6 +142,19 @@ export default function BookForm({
     if (!shrunk) return; // 줄이기에 실패했거나 그 사이 다른 사진을 골랐다
 
     await readCover(shrunk.file);
+  }
+
+  /**
+   * 검색 결과를 골랐을 때. 입력칸만 채운다. (작업 43)
+   *
+   * 빈 값으로 덮어쓰지 않는다 — 검색결과에 지은이가 없는데
+   * 이미 적어둔 지은이가 지워지면 고른 것이 손해가 된다.
+   */
+  function handlePickSearch(result) {
+    setTitle(result.title);
+    if (result.author) setAuthor(result.author);
+    if (result.totalPages) setTotalPages(String(result.totalPages));
+    setJustRecognized(false);
   }
 
   /** 사진을 치우고 손으로 적는 쪽으로 넘어간다. */
@@ -282,20 +296,26 @@ export default function BookForm({
 
           {justRecognized ? (
             // 읽어온 값이 맞는지 사람이 확인해야 한다. AI가 잘못 읽었을 수 있다.
-            <p className="-mt-2 rounded-lg bg-zinc-100 px-3 py-2 text-center text-xs text-zinc-600 dark:bg-zinc-900 dark:text-zinc-400">
+            <p className="-mt-2 rounded-lg bg-surface-soft px-3 py-2 text-center text-xs text-muted">
               표지에서 읽었어요. <strong>확인하고 고쳐주세요.</strong>
             </p>
           ) : (
-            <p className="-mt-2 text-center text-xs text-zinc-400 dark:text-zinc-500">
-              또는 아래에 직접 입력
+            <p className="-mt-2 text-center text-xs text-faint">
+              또는 제목으로 찾거나 아래에 직접 입력
             </p>
           )}
+
+          {/*
+            제목으로 찾기 (작업 43) — 사진이 안 될 때의 두 번째 길이다.
+            고르면 입력칸이 채워질 뿐, 저장은 사람이 누른다.
+          */}
+          <BookSearch onPick={handlePickSearch} />
         </>
       )}
 
       <div>
         <label htmlFor="title" className={labelClass}>
-          제목 <span className="text-rose-600">*</span>
+          제목 <span className="text-danger">*</span>
         </label>
         <input
           id="title"
@@ -376,7 +396,7 @@ export default function BookForm({
             ))}
           </select>
           {/* 새로 생긴 두 상태의 뜻을 한 줄로 알려준다. 골라야 하는 사람이 알아야 한다 */}
-          <p className="mt-1 text-xs text-zinc-500 dark:text-zinc-400">
+          <p className="mt-1 text-xs text-muted">
             일시정지는 나중에 마저 읽을 책, 중단은 그만 읽기로 한 책이에요.
             중단한 책은 완독 합계에 넣지 않아요.
           </p>
@@ -395,7 +415,7 @@ export default function BookForm({
           className={inputClass}
         />
         {!isEditing && (
-          <p className="mt-1 text-xs text-zinc-500 dark:text-zinc-400">
+          <p className="mt-1 text-xs text-muted">
             오늘 날짜로 넣어뒀어요. 다르면 고쳐주세요.
           </p>
         )}
@@ -413,7 +433,7 @@ export default function BookForm({
             onChange={(event) => setFinishedAt(event.target.value)}
             className={inputClass}
           />
-          <p className="mt-1 text-xs text-zinc-500 dark:text-zinc-400">
+          <p className="mt-1 text-xs text-muted">
             비워두면 오늘 날짜로 넣어요.
           </p>
         </div>
@@ -425,14 +445,14 @@ export default function BookForm({
         <button
           type="submit"
           disabled={!canSave}
-          className="flex-1 rounded-full bg-black px-4 py-3 text-sm font-semibold text-white disabled:bg-zinc-300 disabled:text-zinc-500 dark:bg-zinc-50 dark:text-black dark:disabled:bg-zinc-800 dark:disabled:text-zinc-600"
+          className="flex-1 rounded-full bg-brand px-4 py-3 text-sm font-semibold text-brand-ink disabled:bg-line disabled:text-muted"
         >
           {saving ? '저장하는 중…' : '저장'}
         </button>
         <button
           type="button"
           onClick={handleCancel}
-          className="rounded-full border border-black/15 px-6 py-3 text-sm text-zinc-700 dark:border-white/20 dark:text-zinc-300"
+          className="rounded-full border border-line px-6 py-3 text-sm text-muted"
         >
           취소
         </button>

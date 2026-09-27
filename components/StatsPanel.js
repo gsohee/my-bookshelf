@@ -31,17 +31,17 @@ import { getGenreColor, MOODS } from '@/lib/constants';
 import { summarize, countByYear } from '@/lib/stats';
 
 /** 분위기 5종의 색. 장르와 달리 정해진 색이 없어 여기서 한 번만 정한다. */
-const MOOD_COLORS = ['#f59e0b', '#38bdf8', '#a78bfa', '#64748b', '#34d399'];
+const MOOD_COLORS = ['#F8CBA6', '#AFD6F0', '#DDBCE8', '#BFC4D4', '#D7E4A6'];
 
 /** 한 덩어리. 제목과 그래프를 같은 모양으로 감싼다. */
 function Block({ title, hint, children }) {
   return (
-    <section className="rounded-xl border border-black/10 p-4 dark:border-white/15">
-      <h3 className="text-sm font-medium text-black dark:text-zinc-50">
+    <section className="rounded-xl border border-line-soft p-4">
+      <h3 className="text-sm font-medium text-ink">
         {title}
       </h3>
       {hint && (
-        <p className="mt-1 text-xs text-zinc-400 dark:text-zinc-500">{hint}</p>
+        <p className="mt-1 text-xs text-faint">{hint}</p>
       )}
       <div className="mt-3">{children}</div>
     </section>
@@ -104,7 +104,7 @@ export default function StatsPanel() {
           id="statYear"
           value={year ?? ''}
           onChange={(event) => setPicked(Number(event.target.value))}
-          className="rounded-full border border-black/15 bg-white px-3 py-1.5 text-xs font-medium text-zinc-700 outline-none focus:border-black dark:border-white/20 dark:bg-black dark:text-zinc-300"
+          className="rounded-full border border-line bg-surface px-3 py-1.5 text-xs font-medium text-muted outline-none focus:border-brand"
         >
           {years.map((item) => (
             <option key={item} value={item}>
@@ -112,7 +112,7 @@ export default function StatsPanel() {
             </option>
           ))}
         </select>
-        <p className="text-xs text-zinc-500 dark:text-zinc-400">
+        <p className="text-xs text-muted">
           {year}년에 {stat.finishedRounds}번 읽었어요
         </p>
       </div>
@@ -126,7 +126,7 @@ export default function StatsPanel() {
             : null
         }
       >
-        <p className="text-2xl font-semibold tracking-tight text-black dark:text-zinc-50">
+        <p className="text-2xl font-semibold tracking-tight text-ink">
           {stat.pages.pages.toLocaleString('ko-KR')}쪽
         </p>
       </Block>
@@ -148,7 +148,7 @@ export default function StatsPanel() {
               tickFormatter={(value) => `${value}년`}
             />
             <Tooltip formatter={(value) => [`${value}번`, '읽음']} />
-            <Bar dataKey="count" fill="#f59e0b" radius={[0, 4, 4, 0]} />
+            <Bar dataKey="count" fill="var(--brand)" radius={[0, 4, 4, 0]} />
           </BarChart>
         </ResponsiveContainer>
       </Block>
@@ -170,7 +170,7 @@ export default function StatsPanel() {
             <Line
               type="monotone"
               dataKey="count"
-              stroke="#f59e0b"
+              stroke="var(--brand)"
               strokeWidth={2}
               dot={{ r: 3 }}
             />
@@ -181,7 +181,7 @@ export default function StatsPanel() {
       {/* 장르 비율 — 색은 서재의 책등과 같은 색을 쓴다 */}
       <Block title={`${year}년 장르`}>
         {genreData.length === 0 ? (
-          <p className="text-sm text-zinc-500 dark:text-zinc-400">
+          <p className="text-sm text-muted">
             이 해에 다 읽은 책이 없어요.
           </p>
         ) : (
@@ -210,7 +210,7 @@ export default function StatsPanel() {
       {/* 분위기 비율 — 감상을 적은 것만 들어간다 */}
       <Block title={`${year}년 분위기`} hint="감상에서 분위기를 고른 것만 셉니다">
         {moodData.length === 0 ? (
-          <p className="text-sm text-zinc-500 dark:text-zinc-400">
+          <p className="text-sm text-muted">
             아직 고른 분위기가 없어요.
           </p>
         ) : (
@@ -238,7 +238,7 @@ export default function StatsPanel() {
 
       {/* 중단한 책이 빠졌다는 사실을 숨기지 않는다 (S12) */}
       {stat.excluded > 0 && (
-        <p className="text-xs text-zinc-400 dark:text-zinc-500">
+        <p className="text-xs text-faint">
           중단한 책 {stat.excluded}권은 모든 숫자에서 뺐어요.
         </p>
       )}
@@ -257,7 +257,7 @@ function Legend({ items }) {
             style={{ backgroundColor: item.color }}
             className="h-2.5 w-2.5 rounded-full"
           />
-          <span className="text-zinc-600 dark:text-zinc-400">
+          <span className="text-muted">
             {item.name} {item.value}
           </span>
         </li>

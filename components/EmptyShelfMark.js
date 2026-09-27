@@ -20,7 +20,7 @@ export default function EmptyShelfMark() {
         <div
           key={spine.width}
           style={{ width: `${spine.width}px`, height: `${spine.height}px` }}
-          className="rounded-sm border-2 border-dashed border-zinc-200 dark:border-zinc-800"
+          className="rounded-sm border-2 border-dashed border-line"
         />
       ))}
     </div>

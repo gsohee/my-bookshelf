@@ -69,12 +69,12 @@ export default function BookDetail({ id }) {
   if (!book) {
     return (
       <div className="flex flex-1 flex-col items-center justify-center gap-3 text-center">
-        <p className="text-sm text-zinc-500 dark:text-zinc-400">
+        <p className="text-sm text-muted">
           그런 책을 찾지 못했어요.
         </p>
         <Link
           href="/"
-          className="rounded-full border border-black/15 px-5 py-2 text-sm text-zinc-700 dark:border-white/20 dark:text-zinc-300"
+          className="rounded-full border border-line px-5 py-2 text-sm text-muted"
         >
           서재로 가기
         </Link>
@@ -154,7 +154,7 @@ export default function BookDetail({ id }) {
   if (editing) {
     return (
       <div className="flex flex-1 flex-col">
-        <h2 className="mb-4 text-sm font-medium text-zinc-500 dark:text-zinc-400">
+        <h2 className="mb-4 text-sm font-medium text-muted">
           책 고치기
         </h2>
         <BookForm book={book} onDone={() => setEditing(false)} />
@@ -167,7 +167,7 @@ export default function BookDetail({ id }) {
       {/* 서재로 돌아가기 */}
       <Link
         href="/"
-        className="mb-3 inline-flex w-fit items-center gap-1 text-sm text-zinc-500 hover:text-black dark:text-zinc-400 dark:hover:text-zinc-50"
+        className="mb-3 inline-flex w-fit items-center gap-1 text-sm text-muted hover:text-ink"
       >
         ← 서재
       </Link>
@@ -180,10 +180,10 @@ export default function BookDetail({ id }) {
           className="w-1.5 shrink-0 rounded-full"
         />
         <div className="min-w-0 flex-1">
-          <h1 className="text-xl font-semibold leading-8 tracking-tight text-black dark:text-zinc-50">
+          <h1 className="text-xl font-semibold leading-8 tracking-tight text-ink">
             {book.title}
           </h1>
-          <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-400">
+          <p className="mt-1 text-sm text-muted">
             {joinParts([
               book.author,
               book.genre,
@@ -196,26 +196,26 @@ export default function BookDetail({ id }) {
       {/* 상태와 날짜 */}
       <dl className="mt-5 space-y-2 text-sm">
         <div className="flex gap-2">
-          <dt className="w-16 shrink-0 text-zinc-500 dark:text-zinc-400">상태</dt>
-          <dd className="text-black dark:text-zinc-50">{book.status}</dd>
+          <dt className="w-16 shrink-0 text-muted">상태</dt>
+          <dd className="text-ink">{book.status}</dd>
         </div>
         <div className="flex gap-2">
-          <dt className="w-16 shrink-0 text-zinc-500 dark:text-zinc-400">시작일</dt>
-          <dd className="text-black dark:text-zinc-50">
+          <dt className="w-16 shrink-0 text-muted">시작일</dt>
+          <dd className="text-ink">
             {currentRead.startedAt ?? '—'}
           </dd>
         </div>
         <div className="flex gap-2">
-          <dt className="w-16 shrink-0 text-zinc-500 dark:text-zinc-400">완독일</dt>
-          <dd className="text-black dark:text-zinc-50">
+          <dt className="w-16 shrink-0 text-muted">완독일</dt>
+          <dd className="text-ink">
             {currentRead.finishedAt ?? notFinishedLabel(book.status)}
           </dd>
         </div>
         {/* 별점은 완독 감상(작업 21)에서 매긴다. 아직 없으면 줄을 띄우지 않는다. */}
         {rating !== null && (
           <div className="flex gap-2">
-            <dt className="w-16 shrink-0 text-zinc-500 dark:text-zinc-400">별점</dt>
-            <dd className="text-black dark:text-zinc-50">
+            <dt className="w-16 shrink-0 text-muted">별점</dt>
+            <dd className="text-ink">
               {formatRating(rating)}
               {reads.length > 1 && ` (${currentRead.round}회차)`}
             </dd>
@@ -230,17 +230,17 @@ export default function BookDetail({ id }) {
         Design Ref: §5.2 "재독해도 이전 회차 별점이 남는다"
       */}
       {reads.length > 1 && (
-        <div className="mt-5 rounded-xl bg-zinc-50 px-4 py-3 dark:bg-zinc-900">
-          <p className="text-xs font-medium text-zinc-500 dark:text-zinc-400">
+        <div className="mt-5 rounded-xl bg-surface-soft px-4 py-3">
+          <p className="text-xs font-medium text-muted">
             읽은 기록 {reads.length}회
           </p>
           <ul className="mt-2 space-y-1.5 text-sm">
             {[...reads].reverse().map((read) => (
               <li key={read.round} className="flex gap-2">
-                <span className="w-12 shrink-0 text-zinc-500 dark:text-zinc-400">
+                <span className="w-12 shrink-0 text-muted">
                   {read.round}회차
                 </span>
-                <span className="min-w-0 flex-1 text-black dark:text-zinc-50">
+                <span className="min-w-0 flex-1 text-ink">
                   {joinParts([
                     // 끝나지 않은 회차는 마지막 하나뿐이다. 거기에만 상태를 적는다.
                     `${read.startedAt ?? '—'} ~ ${
@@ -272,7 +272,7 @@ export default function BookDetail({ id }) {
         <button
           type="button"
           onClick={handleFinish}
-          className="mt-6 w-full rounded-full bg-black px-4 py-3 text-sm font-semibold text-white dark:bg-zinc-50 dark:text-black"
+          className="mt-6 w-full rounded-full bg-brand px-4 py-3 text-sm font-semibold text-brand-ink"
         >
           다 읽었어요
         </button>
@@ -282,7 +282,7 @@ export default function BookDetail({ id }) {
               건너뛰었다가 나중에 적거나, 적어둔 것을 고칠 수 있어야 한다. */}
           <Link
             href={`/books/${book.id}/finish`}
-            className="block w-full rounded-full border border-black/15 px-4 py-3 text-center text-sm font-medium text-zinc-700 dark:border-white/20 dark:text-zinc-300"
+            className="block w-full rounded-full border border-line px-4 py-3 text-center text-sm font-medium text-muted"
           >
             감상 {hasReview ? '고치기' : '적기'}
           </Link>
@@ -290,14 +290,14 @@ export default function BookDetail({ id }) {
           <button
             type="button"
             onClick={() => setAskReread(true)}
-            className="w-full rounded-full border border-black/15 px-4 py-3 text-sm font-medium text-zinc-700 dark:border-white/20 dark:text-zinc-300"
+            className="w-full rounded-full border border-line px-4 py-3 text-sm font-medium text-muted"
           >
             다시 읽기
           </button>
         </div>
       ) : (
         // 중단. 탓하지 않는 말로 적는다. (CLAUDE.md 8절)
-        <p className="mt-6 rounded-xl bg-zinc-100 px-4 py-3 text-sm leading-6 text-zinc-600 dark:bg-zinc-900 dark:text-zinc-400">
+        <p className="mt-6 rounded-xl bg-surface-soft px-4 py-3 text-sm leading-6 text-muted">
           그만 읽기로 한 책이에요. 완독 합계에는 넣지 않아요.
           <br />
           다시 읽고 싶어지면 아래 고치기에서 상태를 바꿔주세요.
@@ -309,33 +309,33 @@ export default function BookDetail({ id }) {
         <button
           type="button"
           onClick={() => setEditing(true)}
-          className="flex-1 rounded-full border border-black/15 px-4 py-3 text-sm font-medium text-zinc-700 dark:border-white/20 dark:text-zinc-300"
+          className="flex-1 rounded-full border border-line px-4 py-3 text-sm font-medium text-muted"
         >
           고치기
         </button>
         <button
           type="button"
           onClick={() => setAskDelete(true)}
-          className="rounded-full border border-rose-200 px-6 py-3 text-sm text-rose-700 dark:border-rose-900 dark:text-rose-400"
+          className="rounded-full border border-danger/40 px-6 py-3 text-sm text-danger"
         >
           지우기
         </button>
       </div>
 
       {/* 구절 모아보기 */}
-      <div className="mt-6 border-t border-black/10 pt-5 dark:border-white/15">
+      <div className="mt-6 border-t border-line-soft pt-5">
         <div className="flex items-center justify-between gap-2">
-          <p className="text-sm font-medium text-black dark:text-zinc-50">
+          <p className="text-sm font-medium text-ink">
             구절 {bookQuotes.length}개
             {tagFilter !== null && (
-              <span className="ml-1 text-xs font-normal text-zinc-500 dark:text-zinc-400">
+              <span className="ml-1 text-xs font-normal text-muted">
                 #{tagFilter}
               </span>
             )}
           </p>
           <Link
             href={`/books/${book.id}/quotes/new`}
-            className="rounded-full border border-black/15 px-4 py-2 text-sm text-zinc-700 dark:border-white/20 dark:text-zinc-300"
+            className="rounded-full border border-line px-4 py-2 text-sm text-muted"
           >
             ＋ 구절 추가
           </Link>
@@ -346,7 +346,7 @@ export default function BookDetail({ id }) {
           <button
             type="button"
             onClick={() => setTagFilter(null)}
-            className="mt-2 rounded-full border border-black/15 px-3 py-1.5 text-xs text-zinc-700 dark:border-white/20 dark:text-zinc-300"
+            className="mt-2 rounded-full border border-line px-3 py-1.5 text-xs text-muted"
           >
             #{tagFilter} ✖ 전체 보기
           </button>

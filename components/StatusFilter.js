@@ -20,7 +20,7 @@ export default function StatusFilter({ value, onChange }) {
         id="statusFilter"
         value={value}
         onChange={(event) => onChange(event.target.value)}
-        className="rounded-full border border-black/15 bg-white px-3 py-1.5 text-xs font-medium text-zinc-700 outline-none focus:border-black dark:border-white/20 dark:bg-black dark:text-zinc-300 dark:focus:border-zinc-300"
+        className="rounded-full border border-line bg-surface px-3 py-1.5 text-xs font-medium text-muted outline-none focus:border-brand"
       >
         {STATUS_FILTER_OPTIONS.map((option) => (
           <option key={option} value={option}>

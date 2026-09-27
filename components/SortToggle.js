@@ -20,10 +20,10 @@ export default function SortToggle({ sortKey, onChange }) {
       type="button"
       onClick={() => onChange(next)}
       aria-label={`정렬 기준: ${sortLabel(sortKey)}. 누르면 ${sortLabel(next)}으로 바뀝니다`}
-      className="inline-flex items-center gap-1.5 rounded-full border border-black/15 px-3 py-1.5 text-xs font-medium text-zinc-700 transition-colors hover:border-black hover:text-black dark:border-white/20 dark:text-zinc-300 dark:hover:border-zinc-300 dark:hover:text-zinc-50"
+      className="inline-flex items-center gap-1.5 rounded-full border border-line px-3 py-1.5 text-xs font-medium text-muted transition-colors hover:border-brand hover:text-ink"
     >
       {sortLabel(sortKey)}
-      <span aria-hidden="true" className="text-zinc-400">
+      <span aria-hidden="true" className="text-faint">
         ⇄
       </span>
     </button>

@@ -63,18 +63,18 @@ export default function ConfirmDialog({
       onCancel={handleEscape}
       onClick={handleBackdropClick}
       aria-labelledby={titleId}
-      className="m-auto w-[calc(100%-2rem)] max-w-sm border-0 bg-transparent p-0 backdrop:bg-black/50"
+      className="m-auto w-[calc(100%-2rem)] max-w-sm border-0 bg-transparent p-0 backdrop:bg-brand/60"
     >
-      <div className="rounded-2xl bg-white p-5 shadow-xl dark:bg-zinc-900">
+      <div className="rounded-2xl bg-surface p-5 shadow-xl">
         <h2
           id={titleId}
-          className="text-base font-semibold text-black dark:text-zinc-50"
+          className="text-base font-semibold text-ink"
         >
           {title}
         </h2>
 
         {description && (
-          <p className="mt-2 text-sm leading-6 text-zinc-600 dark:text-zinc-400">
+          <p className="mt-2 text-sm leading-6 text-muted">
             {description}
           </p>
         )}
@@ -83,14 +83,14 @@ export default function ConfirmDialog({
           <button
             type="button"
             onClick={onCancel}
-            className="flex-1 rounded-full border border-black/15 px-4 py-3 text-sm text-zinc-700 dark:border-white/20 dark:text-zinc-300"
+            className="flex-1 rounded-full border border-line px-4 py-3 text-sm text-muted"
           >
             {cancelLabel}
           </button>
           <button
             type="button"
             onClick={onConfirm}
-            className="flex-1 rounded-full bg-black px-4 py-3 text-sm font-semibold text-white dark:bg-zinc-50 dark:text-black"
+            className="flex-1 rounded-full bg-brand px-4 py-3 text-sm font-semibold text-brand-ink"
           >
             {confirmLabel}
           </button>

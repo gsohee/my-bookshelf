@@ -32,9 +32,9 @@ import { useCameraImage } from '@/components/useCameraImage';
 import { useApiCall } from '@/components/useApiCall';
 import { callApi } from '@/lib/api';
 
-const labelClass = 'block text-sm font-medium text-zinc-700 dark:text-zinc-300';
+const labelClass = 'block text-sm font-medium text-muted';
 const fieldClass =
-  'mt-1 w-full rounded-lg border border-black/15 bg-white px-3 py-2 text-base text-black outline-none focus:border-black dark:border-white/20 dark:bg-black dark:text-zinc-50 dark:focus:border-zinc-300';
+  'mt-1 w-full rounded-lg border border-line bg-surface px-3 py-2 text-base text-ink outline-none focus:border-brand';
 
 /**
  * @param bookId 어느 책의 구절인지
@@ -98,12 +98,12 @@ export default function QuoteForm({ bookId, quote = null, onDone }) {
   if (!book) {
     return (
       <div className="flex flex-1 flex-col items-center justify-center gap-3 text-center">
-        <p className="text-sm text-zinc-500 dark:text-zinc-400">
+        <p className="text-sm text-muted">
           그런 책을 찾지 못했어요.
         </p>
         <Link
           href="/"
-          className="rounded-full border border-black/15 px-5 py-2 text-sm text-zinc-700 dark:border-white/20 dark:text-zinc-300"
+          className="rounded-full border border-line px-5 py-2 text-sm text-muted"
         >
           서재로 가기
         </Link>
@@ -221,7 +221,7 @@ export default function QuoteForm({ bookId, quote = null, onDone }) {
     >
       {!isEditing && (
         <>
-          <p className="text-xs text-zinc-500 dark:text-zinc-400">
+          <p className="text-xs text-muted">
             『{book.title}』에 담을 구절
           </p>
 
@@ -248,11 +248,11 @@ export default function QuoteForm({ bookId, quote = null, onDone }) {
 
           {justRecognized ? (
             // 읽어온 글이 맞는지 사람이 확인해야 한다. AI가 잘못 읽었을 수 있다.
-            <p className="-mt-1 rounded-lg bg-zinc-100 px-3 py-2 text-center text-xs text-zinc-600 dark:bg-zinc-900 dark:text-zinc-400">
+            <p className="-mt-1 rounded-lg bg-surface-soft px-3 py-2 text-center text-xs text-muted">
               사진에서 읽었어요. <strong>확인하고 고쳐주세요.</strong>
             </p>
           ) : (
-            <p className="-mt-1 text-center text-xs text-zinc-400 dark:text-zinc-500">
+            <p className="-mt-1 text-center text-xs text-faint">
               또는 아래에 직접 입력
             </p>
           )}
@@ -261,7 +261,7 @@ export default function QuoteForm({ bookId, quote = null, onDone }) {
 
       <div>
         <label htmlFor={textId} className={labelClass}>
-          구절 <span className="text-rose-600">*</span>
+          구절 <span className="text-danger">*</span>
         </label>
         <textarea
           id={textId}
@@ -291,15 +291,15 @@ export default function QuoteForm({ bookId, quote = null, onDone }) {
         />
         {/* 사진에서 읽은 번호인지 알려준다. 틀릴 수 있으므로 확인하게 한다 (작업 38) */}
         {recognizedPage !== null && String(recognizedPage) === page.trim() ? (
-          <p className="mt-1 text-xs text-zinc-600 dark:text-zinc-400">
+          <p className="mt-1 text-xs text-muted">
             사진에서 읽은 쪽 번호예요. <strong>맞는지 봐주세요.</strong>
           </p>
         ) : justRecognized && recognizedPage === null ? (
-          <p className="mt-1 text-xs text-zinc-500 dark:text-zinc-400">
+          <p className="mt-1 text-xs text-muted">
             사진에서 쪽 번호를 찾지 못했어요. 직접 적어주세요.
           </p>
         ) : (
-          <p className="mt-1 text-xs text-zinc-500 dark:text-zinc-400">
+          <p className="mt-1 text-xs text-muted">
             비워두면 모아볼 때 맨 뒤에 놓여요.
           </p>
         )}
@@ -328,7 +328,7 @@ export default function QuoteForm({ bookId, quote = null, onDone }) {
         <button
           type="submit"
           disabled={!canSave}
-          className={`flex-1 rounded-full bg-black font-semibold text-white disabled:bg-zinc-300 disabled:text-zinc-500 dark:bg-zinc-50 dark:text-black dark:disabled:bg-zinc-800 dark:disabled:text-zinc-600 ${
+          className={`flex-1 rounded-full bg-brand font-semibold text-brand-ink disabled:bg-line disabled:text-muted ${
             isEditing ? 'px-4 py-2.5 text-sm' : 'px-4 py-3 text-sm'
           }`}
         >
@@ -342,7 +342,7 @@ export default function QuoteForm({ bookId, quote = null, onDone }) {
             if (onDone) onDone();
             else router.push(`/books/${bookId}`);
           }}
-          className={`rounded-full border border-black/15 text-sm text-zinc-700 dark:border-white/20 dark:text-zinc-300 ${
+          className={`rounded-full border border-line text-sm text-muted ${
             isEditing ? 'px-5 py-2.5' : 'px-6 py-3'
           }`}
         >

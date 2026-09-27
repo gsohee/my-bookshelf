@@ -78,10 +78,11 @@ export default function AppFrame({ children }) {
   return (
     // 기준 폭은 380px. 넓은 화면에서는 가운데에 한 줄로 세운다.
     // Design Ref: §1.2 "380px가 기준"
-    <div className="mx-auto flex min-h-dvh w-full max-w-md flex-col bg-white dark:bg-black">
+    // 바탕은 body의 석양 그라데이션이 그대로 비쳐야 하므로 여기에 색을 깔지 않는다.
+    <div className="mx-auto flex min-h-dvh w-full max-w-md flex-col">
       {/* 상단 — 화면 제목. 화면별 동작 버튼은 각 화면이 나중에 채운다. */}
-      <header className="sticky top-0 z-10 flex h-14 shrink-0 items-center justify-between border-b border-black/10 bg-white/90 px-4 backdrop-blur dark:border-white/15 dark:bg-black/90">
-        <p className="text-base font-semibold tracking-tight text-black dark:text-zinc-50">
+      <header className="sticky top-0 z-10 flex h-14 shrink-0 items-center justify-between border-b border-line-soft bg-background/60 px-4 backdrop-blur-md">
+        <p className="text-base font-semibold tracking-tight text-ink">
           {screenTitle(pathname, activeTab)}
         </p>
       </header>
@@ -96,7 +97,7 @@ export default function AppFrame({ children }) {
       {/* 하단 — 탭 */}
       <nav
         aria-label="주요 화면"
-        className="sticky bottom-0 shrink-0 border-t border-black/10 bg-white/90 backdrop-blur dark:border-white/15 dark:bg-black/90"
+        className="sticky bottom-0 shrink-0 border-t border-line-soft bg-background/60 backdrop-blur-md"
       >
         <ul className="flex">
           {TABS.map((tab) => {
@@ -107,12 +108,19 @@ export default function AppFrame({ children }) {
                 <Link
                   href={tab.href}
                   aria-current={isActive ? 'page' : undefined}
-                  className={`flex h-14 items-center justify-center text-xs transition-colors sm:text-sm ${
+                  className={`relative flex h-14 items-center justify-center text-xs transition-colors sm:text-sm ${
                     isActive
-                      ? 'font-semibold text-black dark:text-zinc-50'
-                      : 'text-zinc-500 hover:text-black dark:text-zinc-400 dark:hover:text-zinc-50'
+                      ? 'font-semibold text-brand'
+                      : 'text-muted hover:text-ink'
                   }`}
                 >
+                  {/* 지금 보고 있는 탭에 밑줄을 그어 글자색만으로 구분하지 않게 한다 */}
+                  {isActive && (
+                    <span
+                      aria-hidden="true"
+                      className="absolute inset-x-3 bottom-1.5 h-0.5 rounded-full bg-brand"
+                    />
+                  )}
                   {tab.label}
                 </Link>
               </li>

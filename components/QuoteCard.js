@@ -85,7 +85,7 @@ export default function QuoteCard({ quote, book, onPickTag }) {
 
   if (editing) {
     return (
-      <li className="rounded-xl border border-black/15 p-3 dark:border-white/20">
+      <li className="rounded-xl border border-line p-3">
         <QuoteForm
           bookId={quote.bookId}
           quote={quote}
@@ -96,18 +96,18 @@ export default function QuoteCard({ quote, book, onPickTag }) {
   }
 
   return (
-    <li className="rounded-xl border border-black/10 p-3 dark:border-white/15">
-      <p className="text-xs text-zinc-400 dark:text-zinc-500">
+    <li className="rounded-xl border border-line-soft p-3">
+      <p className="text-xs text-faint">
         {quote.page ? `${quote.page}쪽` : '쪽수 없음'}
       </p>
 
       {/* 줄바꿈을 적은 그대로 보여준다 */}
-      <p className="mt-1 whitespace-pre-wrap text-sm leading-7 text-black dark:text-zinc-50">
+      <p className="mt-1 whitespace-pre-wrap text-sm leading-7 text-ink">
         {quote.text}
       </p>
 
       {quote.thought && (
-        <p className="mt-2 whitespace-pre-wrap border-l-2 border-black/10 pl-3 text-sm leading-6 text-zinc-600 dark:border-white/15 dark:text-zinc-400">
+        <p className="mt-2 whitespace-pre-wrap border-l-2 border-line-soft pl-3 text-sm leading-6 text-muted">
           {quote.thought}
         </p>
       )}
@@ -120,7 +120,7 @@ export default function QuoteCard({ quote, book, onPickTag }) {
               <button
                 type="button"
                 onClick={() => onPickTag?.(tag)}
-                className="rounded-full bg-zinc-100 px-2.5 py-1 text-xs text-zinc-600 dark:bg-zinc-800 dark:text-zinc-400"
+                className="rounded-full bg-surface-soft px-2.5 py-1 text-xs text-muted"
               >
                 #{tag}
               </button>
@@ -141,21 +141,21 @@ export default function QuoteCard({ quote, book, onPickTag }) {
           type="button"
           onClick={handleCopy}
           aria-live="polite"
-          className="mr-auto rounded-full border border-black/15 px-3 py-1.5 text-xs text-zinc-700 dark:border-white/20 dark:text-zinc-300"
+          className="mr-auto rounded-full border border-line px-3 py-1.5 text-xs text-muted"
         >
           {copied ? '복사했어요' : '복사'}
         </button>
         <button
           type="button"
           onClick={() => setEditing(true)}
-          className="text-xs text-zinc-500 underline-offset-4 hover:underline dark:text-zinc-400"
+          className="text-xs text-muted underline-offset-4 hover:underline"
         >
           고치기
         </button>
         <button
           type="button"
           onClick={() => setAskDelete(true)}
-          className="text-xs text-rose-600 underline-offset-4 hover:underline dark:text-rose-400"
+          className="text-xs text-danger underline-offset-4 hover:underline"
         >
           지우기
         </button>

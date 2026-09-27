@@ -32,10 +32,10 @@ function Progress({ label, done, goal, unit }) {
   return (
     <div>
       <div className="flex items-baseline justify-between gap-2">
-        <p className="text-sm text-zinc-600 dark:text-zinc-400">{label}</p>
-        <p className="text-sm text-black dark:text-zinc-50">
+        <p className="text-sm text-muted">{label}</p>
+        <p className="text-sm text-ink">
           {done.toLocaleString('ko-KR')}
-          <span className="text-zinc-400 dark:text-zinc-500">
+          <span className="text-faint">
             {' / '}
             {goal.toLocaleString('ko-KR')}
             {unit}
@@ -48,14 +48,14 @@ function Progress({ label, done, goal, unit }) {
         aria-valuemin={0}
         aria-valuemax={100}
         aria-label={label}
-        className="mt-1.5 h-2 overflow-hidden rounded-full bg-zinc-100 dark:bg-zinc-800"
+        className="mt-1.5 h-2 overflow-hidden rounded-full bg-surface-soft"
       >
         <div
           style={{ width: `${percent}%` }}
-          className="h-full rounded-full bg-amber-500 transition-[width]"
+          className="h-full rounded-full bg-warn-bg0 transition-[width]"
         />
       </div>
-      <p className="mt-1 text-xs text-zinc-400 dark:text-zinc-500">
+      <p className="mt-1 text-xs text-faint">
         {done >= goal ? '목표를 채웠어요' : `${percent}%`}
       </p>
     </div>
@@ -63,7 +63,7 @@ function Progress({ label, done, goal, unit }) {
 }
 
 const inputClass =
-  'mt-1 w-full rounded-lg border border-black/15 bg-white px-3 py-2 text-base text-black outline-none focus:border-black dark:border-white/20 dark:bg-black dark:text-zinc-50 dark:focus:border-zinc-300';
+  'mt-1 w-full rounded-lg border border-line bg-surface px-3 py-2 text-base text-ink outline-none focus:border-brand';
 
 export default function GoalPanel() {
   const books = useBooks();
@@ -125,16 +125,16 @@ export default function GoalPanel() {
   const hasGoal = settings.yearlyBooks > 0 || settings.yearlyPages > 0;
 
   return (
-    <section className="rounded-xl border border-black/10 p-4 dark:border-white/15">
+    <section className="rounded-xl border border-line-soft p-4">
       <div className="flex items-center justify-between gap-2">
-        <h2 className="text-sm font-medium text-black dark:text-zinc-50">
+        <h2 className="text-sm font-medium text-ink">
           {year}년 목표
         </h2>
         {!editing && (
           <button
             type="button"
             onClick={openEditor}
-            className="rounded-full border border-black/15 px-3 py-1.5 text-xs text-zinc-700 dark:border-white/20 dark:text-zinc-300"
+            className="rounded-full border border-line px-3 py-1.5 text-xs text-muted"
           >
             {hasGoal ? '고치기' : '정하기'}
           </button>
@@ -144,7 +144,7 @@ export default function GoalPanel() {
       {editing ? (
         <form onSubmit={handleSave} className="mt-3 flex flex-col gap-3">
           <div>
-            <label htmlFor="goalBooks" className="text-sm text-zinc-600 dark:text-zinc-400">
+            <label htmlFor="goalBooks" className="text-sm text-muted">
               올해 읽을 권수
             </label>
             <input
@@ -159,7 +159,7 @@ export default function GoalPanel() {
             />
           </div>
           <div>
-            <label htmlFor="goalPages" className="text-sm text-zinc-600 dark:text-zinc-400">
+            <label htmlFor="goalPages" className="text-sm text-muted">
               올해 읽을 쪽수
             </label>
             <input
@@ -176,14 +176,14 @@ export default function GoalPanel() {
           <div className="flex gap-2">
             <button
               type="submit"
-              className="flex-1 rounded-full bg-black px-4 py-2.5 text-sm font-semibold text-white dark:bg-zinc-50 dark:text-black"
+              className="flex-1 rounded-full bg-brand px-4 py-2.5 text-sm font-semibold text-brand-ink"
             >
               저장
             </button>
             <button
               type="button"
               onClick={() => setEditing(false)}
-              className="rounded-full border border-black/15 px-5 py-2.5 text-sm text-zinc-500 dark:border-white/20 dark:text-zinc-400"
+              className="rounded-full border border-line px-5 py-2.5 text-sm text-muted"
             >
               취소
             </button>
@@ -209,7 +209,7 @@ export default function GoalPanel() {
           )}
         </div>
       ) : (
-        <p className="mt-2 text-sm leading-6 text-zinc-600 dark:text-zinc-400">
+        <p className="mt-2 text-sm leading-6 text-muted">
           올해 {stat.finishedRounds}권을 읽었어요. 목표를 정하면 여기에 진행률이
           보여요.
         </p>

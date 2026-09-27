@@ -97,12 +97,12 @@ export default function RecommendResult({ bookId }) {
   if (!book) {
     return (
       <div className="flex flex-1 flex-col items-center justify-center gap-3 text-center">
-        <p className="text-sm text-zinc-500 dark:text-zinc-400">
+        <p className="text-sm text-muted">
           그런 책을 찾지 못했어요.
         </p>
         <Link
           href="/"
-          className="rounded-full border border-black/15 px-5 py-2 text-sm text-zinc-700 dark:border-white/20 dark:text-zinc-300"
+          className="rounded-full border border-line px-5 py-2 text-sm text-muted"
         >
           서재로 가기
         </Link>
@@ -147,7 +147,7 @@ export default function RecommendResult({ bookId }) {
 
   return (
     <div className="flex flex-1 flex-col gap-4">
-      <p className="text-xs text-zinc-500 dark:text-zinc-400">
+      <p className="text-xs text-muted">
         『{book.title}』을(를) 읽은 뒤에 어울리는 책이에요
       </p>
 
@@ -155,16 +155,16 @@ export default function RecommendResult({ bookId }) {
         PRD N1이 못박은 문구. 추천이 나오든 안 나오든 늘 보인다.
         AI가 없는 책을 지어낼 수 있기 때문이다.
       */}
-      <p className="rounded-lg bg-amber-50 px-3 py-2.5 text-xs leading-5 text-amber-900 dark:bg-amber-950/50 dark:text-amber-200">
+      <p className="rounded-lg bg-warn-bg px-3 py-2.5 text-xs leading-5 text-warn-text">
         ⚠ AI 추천이므로 실제 도서 여부를 확인하세요.
       </p>
 
       {recommend.loading && (
         <div className="flex flex-1 flex-col items-center justify-center gap-1 text-center">
-          <p className="text-sm font-medium text-zinc-700 dark:text-zinc-300">
+          <p className="text-sm font-medium text-muted">
             어울리는 책을 찾는 중…
           </p>
-          <p className="text-xs text-zinc-400 dark:text-zinc-500">몇 초 걸려요</p>
+          <p className="text-xs text-faint">몇 초 걸려요</p>
         </div>
       )}
 
@@ -172,7 +172,7 @@ export default function RecommendResult({ bookId }) {
         <div className="flex flex-1 flex-col items-center justify-center gap-3 text-center">
           <p
             role="alert"
-            className="rounded-lg bg-amber-100 px-3 py-2 text-sm text-amber-900 dark:bg-amber-950 dark:text-amber-100"
+            className="rounded-lg bg-warn-bg px-3 py-2 text-sm text-warn-text"
           >
             {recommend.errorMessage}
           </p>
@@ -185,7 +185,7 @@ export default function RecommendResult({ bookId }) {
                     if (data) setReceived(data.books);
                   });
                 }}
-                className="rounded-full bg-black px-5 py-2.5 text-sm font-semibold text-white dark:bg-zinc-50 dark:text-black"
+                className="rounded-full bg-brand px-5 py-2.5 text-sm font-semibold text-brand-ink"
               >
                 다시 시도
               </button>
@@ -193,7 +193,7 @@ export default function RecommendResult({ bookId }) {
             <button
               type="button"
               onClick={goBack}
-              className="rounded-full border border-black/15 px-5 py-2.5 text-sm text-zinc-700 dark:border-white/20 dark:text-zinc-300"
+              className="rounded-full border border-line px-5 py-2.5 text-sm text-muted"
             >
               건너뛰기
             </button>
@@ -205,10 +205,10 @@ export default function RecommendResult({ bookId }) {
         <>
           {shown.length === 0 ? (
             <div className="flex flex-1 flex-col items-center justify-center gap-2 text-center">
-              <p className="text-sm text-zinc-500 dark:text-zinc-400">
+              <p className="text-sm text-muted">
                 권해줄 만한 새 책을 찾지 못했어요.
               </p>
-              <p className="text-xs text-zinc-400 dark:text-zinc-500">
+              <p className="text-xs text-faint">
                 추천된 책이 이미 서재에 있을 수 있어요.
               </p>
             </div>
@@ -219,16 +219,16 @@ export default function RecommendResult({ bookId }) {
                 return (
                   <li
                     key={`${item.title}|${item.author}`}
-                    className="rounded-xl border border-black/10 p-3 dark:border-white/15"
+                    className="rounded-xl border border-line-soft p-3"
                   >
-                    <p className="text-sm font-semibold text-black dark:text-zinc-50">
+                    <p className="text-sm font-semibold text-ink">
                       {item.title}
                     </p>
-                    <p className="mt-0.5 text-xs text-zinc-500 dark:text-zinc-400">
+                    <p className="mt-0.5 text-xs text-muted">
                       {item.author}
                     </p>
                     {item.reason && (
-                      <p className="mt-2 text-sm leading-6 text-zinc-600 dark:text-zinc-400">
+                      <p className="mt-2 text-sm leading-6 text-muted">
                         {item.reason}
                       </p>
                     )}
@@ -237,7 +237,7 @@ export default function RecommendResult({ bookId }) {
                         type="button"
                         onClick={() => handleSave(item)}
                         disabled={saved}
-                        className="rounded-full border border-black/15 px-4 py-2 text-sm text-zinc-700 disabled:border-transparent disabled:bg-zinc-100 disabled:text-zinc-400 dark:border-white/20 dark:text-zinc-300 dark:disabled:bg-zinc-900 dark:disabled:text-zinc-600"
+                        className="rounded-full border border-line px-4 py-2 text-sm text-muted disabled:border-transparent disabled:bg-surface-soft disabled:text-faint"
                       >
                         {saved ? '저장됨' : '읽을 책에 저장'}
                       </button>
@@ -253,7 +253,7 @@ export default function RecommendResult({ bookId }) {
           <button
             type="button"
             onClick={goBack}
-            className="mt-auto w-full rounded-full border border-black/15 px-4 py-3 text-sm text-zinc-700 dark:border-white/20 dark:text-zinc-300"
+            className="mt-auto w-full rounded-full border border-line px-4 py-3 text-sm text-muted"
           >
             책으로 돌아가기
           </button>

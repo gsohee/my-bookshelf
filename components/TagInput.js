@@ -44,7 +44,7 @@ export default function TagInput({ value, onChange, suggestions = [] }) {
     <div>
       <label
         htmlFor={inputId}
-        className="block text-sm font-medium text-zinc-700 dark:text-zinc-300"
+        className="block text-sm font-medium text-muted"
       >
         태그
       </label>
@@ -57,7 +57,7 @@ export default function TagInput({ value, onChange, suggestions = [] }) {
                 type="button"
                 onClick={() => onChange(value.filter((item) => item !== tag))}
                 aria-label={`${tag} 태그 빼기`}
-                className="flex items-center gap-1 rounded-full bg-zinc-800 px-3 py-1.5 text-xs text-white dark:bg-zinc-200 dark:text-black"
+                className="flex items-center gap-1 rounded-full bg-brand px-3 py-1.5 text-xs text-brand-ink"
               >
                 {tag}
                 <span aria-hidden="true">×</span>
@@ -75,13 +75,13 @@ export default function TagInput({ value, onChange, suggestions = [] }) {
           onChange={(event) => setDraft(event.target.value)}
           onKeyDown={handleKeyDown}
           placeholder="예: 위로, 문장이 좋음"
-          className="min-w-0 flex-1 rounded-lg border border-black/15 bg-white px-3 py-2 text-base text-black outline-none focus:border-black dark:border-white/20 dark:bg-black dark:text-zinc-50 dark:focus:border-zinc-300"
+          className="min-w-0 flex-1 rounded-lg border border-line bg-surface px-3 py-2 text-base text-ink outline-none focus:border-brand"
         />
         <button
           type="button"
           onClick={() => add(draft)}
           disabled={draft.trim() === ''}
-          className="shrink-0 rounded-full border border-black/15 px-4 py-2 text-sm text-zinc-700 disabled:text-zinc-300 dark:border-white/20 dark:text-zinc-300 dark:disabled:text-zinc-700"
+          className="shrink-0 rounded-full border border-line px-4 py-2 text-sm text-muted disabled:text-faint"
         >
           넣기
         </button>
@@ -89,7 +89,7 @@ export default function TagInput({ value, onChange, suggestions = [] }) {
 
       {notUsed.length > 0 && (
         <div className="mt-2">
-          <p className="text-xs text-zinc-400 dark:text-zinc-500">
+          <p className="text-xs text-faint">
             전에 쓴 태그
           </p>
           <ul className="mt-1 flex flex-wrap gap-1.5">
@@ -98,7 +98,7 @@ export default function TagInput({ value, onChange, suggestions = [] }) {
                 <button
                   type="button"
                   onClick={() => add(item.tag)}
-                  className="rounded-full border border-black/15 px-3 py-1.5 text-xs text-zinc-600 dark:border-white/20 dark:text-zinc-400"
+                  className="rounded-full border border-line px-3 py-1.5 text-xs text-muted"
                 >
                   {item.tag}
                 </button>

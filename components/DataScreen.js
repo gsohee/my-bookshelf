@@ -53,13 +53,13 @@ import { countFinished, countExcluded } from '@/lib/stats';
  */
 function ExportRow({ label, count, disabled, onExport }) {
   const buttonClass =
-    'rounded-full border border-black/15 px-4 py-2 text-xs text-zinc-700 disabled:border-black/5 disabled:text-zinc-300 dark:border-white/20 dark:text-zinc-300 dark:disabled:border-white/5 dark:disabled:text-zinc-700';
+    'rounded-full border border-line px-4 py-2 text-xs text-muted disabled:border-line-soft disabled:text-faint';
 
   return (
     <div className="flex items-center justify-between gap-2">
-      <p className="text-sm text-black dark:text-zinc-50">
+      <p className="text-sm text-ink">
         {label}{' '}
-        <span className="text-xs text-zinc-400 dark:text-zinc-500">
+        <span className="text-xs text-faint">
           {count}
         </span>
       </p>
@@ -225,13 +225,13 @@ export default function DataScreen() {
   return (
     <div className="flex flex-1 flex-col gap-5">
       <section>
-        <h2 className="text-sm font-medium text-zinc-700 dark:text-zinc-300">
+        <h2 className="text-sm font-medium text-muted">
           지금 담긴 기록
         </h2>
         <dl className="mt-2 flex gap-5 text-sm">
           <div>
-            <dt className="text-xs text-zinc-500 dark:text-zinc-400">책</dt>
-            <dd className="mt-0.5 text-black dark:text-zinc-50">
+            <dt className="text-xs text-muted">책</dt>
+            <dd className="mt-0.5 text-ink">
               {books.length}권
             </dd>
           </div>
@@ -240,20 +240,20 @@ export default function DataScreen() {
             여기 적어 두면 "합계에서 중단이 빠졌는가"를 화면에서 바로 볼 수 있다.
           */}
           <div>
-            <dt className="text-xs text-zinc-500 dark:text-zinc-400">완독</dt>
-            <dd className="mt-0.5 text-black dark:text-zinc-50">
+            <dt className="text-xs text-muted">완독</dt>
+            <dd className="mt-0.5 text-ink">
               {countFinished(books)}권
             </dd>
           </div>
           <div>
-            <dt className="text-xs text-zinc-500 dark:text-zinc-400">구절</dt>
-            <dd className="mt-0.5 text-black dark:text-zinc-50">
+            <dt className="text-xs text-muted">구절</dt>
+            <dd className="mt-0.5 text-ink">
               {quotes.length}개
             </dd>
           </div>
           <div>
-            <dt className="text-xs text-zinc-500 dark:text-zinc-400">읽을 책</dt>
-            <dd className="mt-0.5 text-black dark:text-zinc-50">
+            <dt className="text-xs text-muted">읽을 책</dt>
+            <dd className="mt-0.5 text-ink">
               {toRead.length}권
             </dd>
           </div>
@@ -261,7 +261,7 @@ export default function DataScreen() {
 
         {/* 숫자가 안 맞아 보일 때를 대비해 이유를 적어 둔다 */}
         {countExcluded(books) > 0 && (
-          <p className="mt-2 text-xs text-zinc-400 dark:text-zinc-500">
+          <p className="mt-2 text-xs text-faint">
             중단한 책 {countExcluded(books)}권은 완독 합계에서 뺐어요.
           </p>
         )}
@@ -270,15 +270,15 @@ export default function DataScreen() {
       {/* 연간 목표 (작업 36) */}
       <GoalPanel />
 
-      <section className="rounded-xl border border-black/10 p-4 dark:border-white/15">
-        <h2 className="text-sm font-medium text-black dark:text-zinc-50">
+      <section className="rounded-xl border border-line-soft p-4">
+        <h2 className="text-sm font-medium text-ink">
           백업 파일 내려받기
         </h2>
-        <p className="mt-2 text-sm leading-6 text-zinc-600 dark:text-zinc-400">
+        <p className="mt-2 text-sm leading-6 text-muted">
           기록은 이 브라우저 안에만 있어요. 저장소를 지우거나 기기를 바꾸면
           사라지니, 가끔 파일로 받아두면 안심할 수 있어요.
         </p>
-        <p className="mt-2 text-xs leading-5 text-zinc-400 dark:text-zinc-500">
+        <p className="mt-2 text-xs leading-5 text-faint">
           책·구절·읽을 책이 담깁니다. 사진과 설정값은 들어가지 않아요.
         </p>
 
@@ -286,19 +286,19 @@ export default function DataScreen() {
           type="button"
           onClick={handleBackup}
           disabled={isEmpty}
-          className="mt-4 w-full rounded-full bg-black px-4 py-3 text-sm font-semibold text-white disabled:bg-zinc-200 disabled:text-zinc-400 dark:bg-zinc-50 dark:text-black dark:disabled:bg-zinc-800 dark:disabled:text-zinc-600"
+          className="mt-4 w-full rounded-full bg-brand px-4 py-3 text-sm font-semibold text-brand-ink disabled:bg-line disabled:text-faint"
         >
           백업 파일 받기
         </button>
 
         {isEmpty && (
-          <p className="mt-2 text-center text-xs text-zinc-400 dark:text-zinc-500">
+          <p className="mt-2 text-center text-xs text-faint">
             받을 기록이 아직 없어요.
           </p>
         )}
 
         {done && (
-          <p className="mt-3 rounded-lg bg-zinc-100 px-3 py-2 text-center text-xs text-zinc-600 dark:bg-zinc-900 dark:text-zinc-400">
+          <p className="mt-3 rounded-lg bg-surface-soft px-3 py-2 text-center text-xs text-muted">
             {done} 파일을 받았어요.
           </p>
         )}
@@ -310,11 +310,11 @@ export default function DataScreen() {
         />
       </section>
 
-      <section className="rounded-xl border border-black/10 p-4 dark:border-white/15">
-        <h2 className="text-sm font-medium text-black dark:text-zinc-50">
+      <section className="rounded-xl border border-line-soft p-4">
+        <h2 className="text-sm font-medium text-ink">
           다른 곳으로 옮기기
         </h2>
-        <p className="mt-2 text-sm leading-6 text-zinc-600 dark:text-zinc-400">
+        <p className="mt-2 text-sm leading-6 text-muted">
           <b className="font-medium">CSV</b>는 엑셀·구글 시트에서 열 수 있고,{' '}
           <b className="font-medium">마크다운</b>은 블로그·노션에 그대로
           붙여넣을 수 있어요.
@@ -336,7 +336,7 @@ export default function DataScreen() {
         </div>
 
         {exportDone && (
-          <p className="mt-3 rounded-lg bg-zinc-100 px-3 py-2 text-center text-xs text-zinc-600 dark:bg-zinc-900 dark:text-zinc-400">
+          <p className="mt-3 rounded-lg bg-surface-soft px-3 py-2 text-center text-xs text-muted">
             {exportDone} 파일을 받았어요.
           </p>
         )}
@@ -348,14 +348,14 @@ export default function DataScreen() {
         />
       </section>
 
-      <section className="rounded-xl border border-black/10 p-4 dark:border-white/15">
-        <h2 className="text-sm font-medium text-black dark:text-zinc-50">
+      <section className="rounded-xl border border-line-soft p-4">
+        <h2 className="text-sm font-medium text-ink">
           백업 파일로 되돌리기
         </h2>
-        <p className="mt-2 text-sm leading-6 text-zinc-600 dark:text-zinc-400">
+        <p className="mt-2 text-sm leading-6 text-muted">
           받아둔 파일을 고르면 그때의 기록으로 되돌립니다.
         </p>
-        <p className="mt-2 text-xs leading-5 text-amber-700 dark:text-amber-500">
+        <p className="mt-2 text-xs leading-5 text-warn-text">
           지금 있는 기록은 파일의 내용으로 바뀌어요. 되돌리기 전에 한 번 더 물어봅니다.
         </p>
 
@@ -372,13 +372,13 @@ export default function DataScreen() {
         <button
           type="button"
           onClick={() => fileInputRef.current?.click()}
-          className="mt-4 w-full rounded-full border border-black/15 px-4 py-3 text-sm font-medium text-zinc-700 dark:border-white/20 dark:text-zinc-300"
+          className="mt-4 w-full rounded-full border border-line px-4 py-3 text-sm font-medium text-muted"
         >
           백업 파일 고르기
         </button>
 
         {restoreDone && (
-          <p className="mt-3 rounded-lg bg-zinc-100 px-3 py-2 text-center text-xs leading-5 text-zinc-600 dark:bg-zinc-900 dark:text-zinc-400">
+          <p className="mt-3 rounded-lg bg-surface-soft px-3 py-2 text-center text-xs leading-5 text-muted">
             되돌렸어요. 책 {restoreDone.books}권 · 구절 {restoreDone.quotes}개 ·
             읽을 책 {restoreDone.toRead}권
           </p>

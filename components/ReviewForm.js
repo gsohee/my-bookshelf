@@ -28,7 +28,7 @@ import {
 } from '@/lib/constants';
 
 const sectionLabel =
-  'text-sm font-medium text-zinc-700 dark:text-zinc-300';
+  'text-sm font-medium text-muted';
 
 /** 골랐는지 아닌지를 색으로 보여주는 버튼. */
 function Chip({ label, selected, onClick }) {
@@ -39,8 +39,8 @@ function Chip({ label, selected, onClick }) {
       aria-pressed={selected}
       className={`rounded-full border px-3.5 py-2 text-sm transition-colors ${
         selected
-          ? 'border-black bg-black font-medium text-white dark:border-zinc-50 dark:bg-zinc-50 dark:text-black'
-          : 'border-black/15 text-zinc-700 hover:border-black/40 dark:border-white/20 dark:text-zinc-300 dark:hover:border-white/40'
+          ? 'border-brand bg-brand font-medium text-brand-ink'
+          : 'border-line text-muted hover:border-brand'
       }`}
     >
       {label}
@@ -60,11 +60,11 @@ function Star({ fill }) {
       aria-hidden="true"
       className="relative block h-full w-full text-3xl leading-none"
     >
-      <span className="absolute inset-0 flex items-center justify-center text-zinc-300 dark:text-zinc-700">
+      <span className="absolute inset-0 flex items-center justify-center text-faint">
         ★
       </span>
       <span
-        className="absolute inset-y-0 left-0 overflow-hidden text-amber-500"
+        className="absolute inset-y-0 left-0 overflow-hidden text-brand"
         style={{ width: `${fill * 100}%` }}
       >
         {/* 잘려도 별이 제자리에 있도록, 안쪽은 칸 전체 너비를 유지한다 */}
@@ -121,10 +121,10 @@ function Stars({ value, onChange }) {
           </span>
         ))}
       </div>
-      <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400">
+      <p className="mt-1 text-sm text-muted">
         {formatRating(value) ?? '고르지 않음'}
         {value > 0 && (
-          <span className="ml-2 text-xs text-zinc-400 dark:text-zinc-500">
+          <span className="ml-2 text-xs text-faint">
             별의 왼쪽 절반을 누르면 반 점이에요
           </span>
         )}
@@ -155,12 +155,12 @@ export default function ReviewForm({ bookId }) {
   if (!book) {
     return (
       <div className="flex flex-1 flex-col items-center justify-center gap-3 text-center">
-        <p className="text-sm text-zinc-500 dark:text-zinc-400">
+        <p className="text-sm text-muted">
           그런 책을 찾지 못했어요.
         </p>
         <Link
           href="/"
-          className="rounded-full border border-black/15 px-5 py-2 text-sm text-zinc-700 dark:border-white/20 dark:text-zinc-300"
+          className="rounded-full border border-line px-5 py-2 text-sm text-muted"
         >
           서재로 가기
         </Link>
@@ -214,13 +214,13 @@ export default function ReviewForm({ bookId }) {
 
   return (
     <form onSubmit={handleSubmit} className="flex flex-1 flex-col gap-6">
-      <p className="text-xs text-zinc-500 dark:text-zinc-400">
+      <p className="text-xs text-muted">
         『{book.title}』을(를) 다 읽었어요
       </p>
 
       <fieldset>
         <legend className={sectionLabel}>
-          분위기 <span className="text-zinc-400">(하나)</span>
+          분위기 <span className="text-faint">(하나)</span>
         </legend>
         <div className="mt-2 flex flex-wrap gap-2">
           {MOODS.map((item) => (
@@ -236,7 +236,7 @@ export default function ReviewForm({ bookId }) {
 
       <fieldset>
         <legend className={sectionLabel}>
-          좋았던 점 <span className="text-zinc-400">(여러 개)</span>
+          좋았던 점 <span className="text-faint">(여러 개)</span>
         </legend>
         <div className="mt-2 flex flex-wrap gap-2">
           {LIKED_POINTS.map((item) => (
@@ -281,9 +281,9 @@ export default function ReviewForm({ bookId }) {
           onChange={(event) => setMemo(event.target.value)}
           placeholder="남기고 싶은 말이 있다면"
           rows={3}
-          className="mt-2 w-full resize-y rounded-lg border border-black/15 bg-white px-3 py-2 text-base leading-7 text-black outline-none focus:border-black dark:border-white/20 dark:bg-black dark:text-zinc-50 dark:focus:border-zinc-300"
+          className="mt-2 w-full resize-y rounded-lg border border-line bg-surface px-3 py-2 text-base leading-7 text-ink outline-none focus:border-brand"
         />
-        <p className="mt-1 text-xs text-zinc-500 dark:text-zinc-400">
+        <p className="mt-1 text-xs text-muted">
           메모는 나만 봅니다. AI 추천에 보내지 않아요.
         </p>
       </div>
@@ -294,14 +294,14 @@ export default function ReviewForm({ bookId }) {
         <button
           type="submit"
           disabled={saving}
-          className="flex-1 rounded-full bg-black px-4 py-3 text-sm font-semibold text-white disabled:bg-zinc-300 disabled:text-zinc-500 dark:bg-zinc-50 dark:text-black dark:disabled:bg-zinc-800 dark:disabled:text-zinc-600"
+          className="flex-1 rounded-full bg-brand px-4 py-3 text-sm font-semibold text-brand-ink disabled:bg-line disabled:text-muted"
         >
           {saving ? '저장하는 중…' : '추천 받기'}
         </button>
         <button
           type="button"
           onClick={() => router.push(`/books/${bookId}`)}
-          className="rounded-full border border-black/15 px-6 py-3 text-sm text-zinc-700 dark:border-white/20 dark:text-zinc-300"
+          className="rounded-full border border-line px-6 py-3 text-sm text-muted"
         >
           나중에
         </button>

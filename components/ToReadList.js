@@ -78,7 +78,7 @@ export default function ToReadList() {
   return (
     <div className="flex flex-1 flex-col">
       <div className="mb-3 flex items-center justify-between gap-2">
-        <p className="text-xs text-zinc-500 dark:text-zinc-400">
+        <p className="text-xs text-muted">
           {sorted.length}권
         </p>
         {/* 랜덤 뽑기 (작업 41) — 한 권뿐이면 고를 것이 없어 숨긴다 */}
@@ -86,7 +86,7 @@ export default function ToReadList() {
           <button
             type="button"
             onClick={draw}
-            className="rounded-full border border-black/15 px-3 py-1.5 text-xs text-zinc-700 dark:border-white/20 dark:text-zinc-300"
+            className="rounded-full border border-line px-3 py-1.5 text-xs text-muted"
           >
             🎲 하나 뽑기
           </button>
@@ -95,29 +95,29 @@ export default function ToReadList() {
 
       {/* 뽑은 책을 맨 위에 보여준다. 목록을 눈으로 찾게 하지 않는다 */}
       {drawn && (
-        <div className="mb-3 rounded-xl bg-zinc-100 px-4 py-3 dark:bg-zinc-900">
-          <p className="text-xs text-zinc-500 dark:text-zinc-400">
+        <div className="mb-3 rounded-xl bg-surface-soft px-4 py-3">
+          <p className="text-xs text-muted">
             오늘은 이 책 어때요?
           </p>
-          <p className="mt-1 text-base font-semibold text-black dark:text-zinc-50">
+          <p className="mt-1 text-base font-semibold text-ink">
             {drawn.title}
           </p>
           {drawn.author && (
-            <p className="mt-0.5 text-xs text-zinc-500 dark:text-zinc-400">
+            <p className="mt-0.5 text-xs text-muted">
               {drawn.author}
             </p>
           )}
           <div className="mt-3 flex gap-2">
             <Link
               href={`/books/new?title=${encodeURIComponent(drawn.title)}&author=${encodeURIComponent(drawn.author ?? '')}`}
-              className="flex-1 rounded-full bg-black px-4 py-2.5 text-center text-sm font-semibold text-white dark:bg-zinc-50 dark:text-black"
+              className="flex-1 rounded-full bg-brand px-4 py-2.5 text-center text-sm font-semibold text-brand-ink"
             >
               이 책 읽기 시작
             </Link>
             <button
               type="button"
               onClick={draw}
-              className="rounded-full border border-black/15 px-4 py-2.5 text-sm text-zinc-700 dark:border-white/20 dark:text-zinc-300"
+              className="rounded-full border border-line px-4 py-2.5 text-sm text-muted"
             >
               다시
             </button>
@@ -135,18 +135,18 @@ export default function ToReadList() {
         {sorted.map((item) => (
           <li
             key={item.id}
-            className="rounded-xl border border-black/10 p-3 dark:border-white/15"
+            className="rounded-xl border border-line-soft p-3"
           >
-            <p className="text-sm font-semibold text-black dark:text-zinc-50">
+            <p className="text-sm font-semibold text-ink">
               {item.title}
             </p>
             {item.author && (
-              <p className="mt-0.5 text-xs text-zinc-500 dark:text-zinc-400">
+              <p className="mt-0.5 text-xs text-muted">
                 {item.author}
               </p>
             )}
             {item.reason && (
-              <p className="mt-2 text-sm leading-6 text-zinc-600 dark:text-zinc-400">
+              <p className="mt-2 text-sm leading-6 text-muted">
                 {item.reason}
               </p>
             )}
@@ -155,7 +155,7 @@ export default function ToReadList() {
               <button
                 type="button"
                 onClick={() => setAskDelete(item)}
-                className="text-xs text-zinc-500 underline-offset-4 hover:underline dark:text-zinc-400"
+                className="text-xs text-muted underline-offset-4 hover:underline"
               >
                 지우기
               </button>
@@ -165,7 +165,7 @@ export default function ToReadList() {
               */}
               <Link
                 href={`/books/new?title=${encodeURIComponent(item.title)}&author=${encodeURIComponent(item.author ?? '')}`}
-                className="rounded-full bg-black px-4 py-2 text-sm font-semibold text-white dark:bg-zinc-50 dark:text-black"
+                className="rounded-full bg-brand px-4 py-2 text-sm font-semibold text-brand-ink"
               >
                 읽기 시작
               </Link>

@@ -14,7 +14,7 @@
 import Link from 'next/link';
 
 const actionClass =
-  'rounded-full border border-black/15 px-5 py-2.5 text-sm font-medium text-zinc-700 transition-colors hover:border-black hover:text-black dark:border-white/20 dark:text-zinc-300 dark:hover:border-zinc-300 dark:hover:text-zinc-50';
+  'rounded-full border border-line px-5 py-2.5 text-sm font-medium text-muted transition-colors hover:border-brand hover:text-ink';
 
 /**
  * @param decoration  글자 위에 놓을 그림 같은 것. 읽어주는 도구는 건너뛴다
@@ -40,10 +40,10 @@ export default function EmptyState({
         </div>
       )}
 
-      <p className="text-sm text-zinc-600 dark:text-zinc-300">{title}</p>
+      <p className="text-sm text-muted">{title}</p>
 
       {description && (
-        <p className="text-xs leading-5 text-zinc-400 dark:text-zinc-500">
+        <p className="text-xs leading-5 text-faint">
           {description}
         </p>
       )}

@@ -53,13 +53,13 @@ export default function CurrentPage({ book }) {
   }
 
   return (
-    <div className="mt-4 rounded-xl bg-zinc-50 px-4 py-3 dark:bg-zinc-900">
+    <div className="mt-4 rounded-xl bg-surface-soft px-4 py-3">
       {editing ? (
         <form onSubmit={handleSave} className="flex items-end gap-2">
           <div className="flex-1">
             <label
               htmlFor="currentPage"
-              className="text-xs text-zinc-500 dark:text-zinc-400"
+              className="text-xs text-muted"
             >
               지금 몇 쪽까지 읽었나요{total !== null && ` (총 ${total}쪽)`}
             </label>
@@ -72,19 +72,19 @@ export default function CurrentPage({ book }) {
               value={page}
               onChange={(event) => setPage(event.target.value)}
               placeholder="비워두면 지워요"
-              className="mt-1 w-full rounded-lg border border-black/15 bg-white px-3 py-2 text-base text-black outline-none focus:border-black dark:border-white/20 dark:bg-black dark:text-zinc-50"
+              className="mt-1 w-full rounded-lg border border-line bg-surface px-3 py-2 text-base text-ink outline-none focus:border-brand"
             />
           </div>
           <button
             type="submit"
-            className="rounded-full bg-black px-4 py-2.5 text-sm font-semibold text-white dark:bg-zinc-50 dark:text-black"
+            className="rounded-full bg-brand px-4 py-2.5 text-sm font-semibold text-brand-ink"
           >
             저장
           </button>
           <button
             type="button"
             onClick={() => setEditing(false)}
-            className="rounded-full border border-black/15 px-4 py-2.5 text-sm text-zinc-500 dark:border-white/20 dark:text-zinc-400"
+            className="rounded-full border border-line px-4 py-2.5 text-sm text-muted"
           >
             취소
           </button>
@@ -92,10 +92,10 @@ export default function CurrentPage({ book }) {
       ) : (
         <div className="flex items-center justify-between gap-2">
           <div className="min-w-0">
-            <p className="text-xs text-zinc-500 dark:text-zinc-400">
+            <p className="text-xs text-muted">
               지금 읽은 데까지
             </p>
-            <p className="mt-0.5 text-sm text-black dark:text-zinc-50">
+            <p className="mt-0.5 text-sm text-ink">
               {current === null
                 ? '아직 적지 않았어요'
                 : `${current}쪽${total !== null ? ` / ${total}쪽` : ''}`}
@@ -104,7 +104,7 @@ export default function CurrentPage({ book }) {
           <button
             type="button"
             onClick={open}
-            className="shrink-0 rounded-full border border-black/15 px-3 py-1.5 text-xs text-zinc-700 dark:border-white/20 dark:text-zinc-300"
+            className="shrink-0 rounded-full border border-line px-3 py-1.5 text-xs text-muted"
           >
             {current === null ? '적기' : '고치기'}
           </button>
@@ -120,14 +120,14 @@ export default function CurrentPage({ book }) {
             aria-valuemin={0}
             aria-valuemax={100}
             aria-label="읽은 진행률"
-            className="mt-2 h-1.5 overflow-hidden rounded-full bg-zinc-200 dark:bg-zinc-800"
+            className="mt-2 h-1.5 overflow-hidden rounded-full bg-line"
           >
             <div
               style={{ width: `${percent}%` }}
-              className="h-full rounded-full bg-amber-500"
+              className="h-full rounded-full bg-warn-bg0"
             />
           </div>
-          <p className="mt-1 text-xs text-zinc-400 dark:text-zinc-500">
+          <p className="mt-1 text-xs text-faint">
             {percent}%
           </p>
         </>

@@ -87,7 +87,7 @@ export default function CalendarPanel() {
     .reduce((sum, [, list]) => sum + list.length, 0);
 
   const navButton =
-    'rounded-full border border-black/15 px-3 py-1.5 text-sm text-zinc-700 dark:border-white/20 dark:text-zinc-300';
+    'rounded-full border border-line px-3 py-1.5 text-sm text-muted';
 
   return (
     <div className="flex flex-col gap-3">
@@ -95,9 +95,9 @@ export default function CalendarPanel() {
         <button type="button" onClick={() => shift(-1)} className={navButton}>
           ←
         </button>
-        <p className="text-sm font-medium text-black dark:text-zinc-50">
+        <p className="text-sm font-medium text-ink">
           {year}년 {m}월
-          <span className="ml-2 text-xs font-normal text-zinc-500 dark:text-zinc-400">
+          <span className="ml-2 text-xs font-normal text-muted">
             {monthTotal}권
           </span>
         </p>
@@ -110,7 +110,7 @@ export default function CalendarPanel() {
         {WEEKDAYS.map((day) => (
           <p
             key={day}
-            className="py-1 text-[11px] text-zinc-400 dark:text-zinc-500"
+            className="py-1 text-[11px] text-faint"
           >
             {day}
           </p>
@@ -129,9 +129,9 @@ export default function CalendarPanel() {
           return (
             <div
               key={date}
-              className="flex min-h-12 flex-col items-center gap-1 rounded-lg border border-black/5 py-1 dark:border-white/10"
+              className="flex min-h-12 flex-col items-center gap-1 rounded-lg border border-line-soft py-1"
             >
-              <span className="text-[11px] text-zinc-500 dark:text-zinc-400">
+              <span className="text-[11px] text-muted">
                 {day}
               </span>
               {/* 그날 다 읽은 책을 책등처럼 세워 둔다. 색은 서재와 같은 장르 색 */}
@@ -152,7 +152,7 @@ export default function CalendarPanel() {
         })}
       </div>
 
-      <p className="text-xs text-zinc-400 dark:text-zinc-500">
+      <p className="text-xs text-faint">
         색 막대 하나가 그날 다 읽은 책이에요. 누르면 그 책으로 갑니다.
       </p>
     </div>

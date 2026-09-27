@@ -103,14 +103,14 @@ export default function TodayQuote() {
   const book = books.find((item) => item.id === picked.bookId);
 
   return (
-    <section className="mb-3 rounded-xl bg-zinc-50 px-4 py-3 dark:bg-zinc-900">
-      <p className="text-xs text-zinc-400 dark:text-zinc-500">오늘의 구절</p>
+    <section className="mb-3 rounded-xl bg-surface-soft px-4 py-3">
+      <p className="text-xs text-faint">오늘의 구절</p>
       <blockquote className="mt-1.5">
-        <p className="line-clamp-4 whitespace-pre-wrap text-sm leading-7 text-black dark:text-zinc-50">
+        <p className="line-clamp-4 whitespace-pre-wrap text-sm leading-7 text-ink">
           “{picked.text}”
         </p>
         {book && (
-          <footer className="mt-1.5 text-xs text-zinc-500 dark:text-zinc-400">
+          <footer className="mt-1.5 text-xs text-muted">
             —{' '}
             <Link
               href={`/books/${book.id}`}

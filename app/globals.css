@@ -1,27 +1,82 @@
 @import "tailwindcss";
 
+/*
+  나의 책장 — 색과 모양
+  ────────────────────────────────────────────────────────────
+  "컬러나 글자 크기 등 디자인 시스템이 잘 지켜져서 매우 정리되어 보였어"
+  화면마다 zinc-500 / black/15 같은 값을 따로 적으면 조금씩 어긋난다.
+  쓸 색은 여기서만 정하고, 화면은 이름으로만 부른다.
+
+  바탕은 **미색(종이빛)**. 그 위에 나무 선반과 파스텔 책등이 놓인다.
+
+  기기 설정(밝게/어둡게)에 따라 갈라지지 않게 한 벌로 둔다 —
+  설정에 따라 서재 색이 달라지면 "내 책장"이 두 벌이 되기 때문이다.
+  밤 화면이 필요해지면 아래에 @media (prefers-color-scheme: dark)를 더해
+  같은 이름들만 덮어쓰면 된다. 화면 코드는 하나도 바뀌지 않는다.
+*/
+
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* ── 바탕 ── */
+  --background: #f8f3e9;   /* 미색 — 화면 바닥 */
+  --surface: #fffdf8;      /* 카드·칸 — 바닥보다 한 겹 위 */
+  --surface-soft: #f1e9d9; /* 아주 옅게 구분할 때 */
+
+  /* ── 글자 ── 세 단계면 충분하다. 더 늘리면 어느 걸 쓸지 헷갈린다 */
+  --text: #3a3229;         /* 본문·제목 */
+  --text-muted: #6b6155;   /* 설명·보조 */
+  --text-faint: #9c9083;   /* 단위·각주 */
+
+  /* ── 선 ── */
+  --line: #e2d7c2;
+  --line-soft: #eee6d6;
+
+  /* ── 나무 선반 ── */
+  --shelf: #c99a6a;
+  --shelf-edge: #a87c4c;
+
+  /* ── 주색 ── 미색 위에서 또렷한 따뜻한 주황 */
+  --brand: #c2611c;
+  --brand-strong: #9a4b12;
+  --brand-ink: #fffdf8;    /* 주색 위에 얹는 글자 */
+
+  /* ── 알림 ── */
+  --warn-bg: #fbeacf;
+  --warn-text: #7a3e12;
+  --danger: #c2405c;
 }
 
 @theme inline {
   --color-background: var(--background);
-  --color-foreground: var(--foreground);
+  --color-surface: var(--surface);
+  --color-surface-soft: var(--surface-soft);
+
+  --color-ink: var(--text);
+  --color-muted: var(--text-muted);
+  --color-faint: var(--text-faint);
+
+  --color-line: var(--line);
+  --color-line-soft: var(--line-soft);
+
+  --color-shelf: var(--shelf);
+  --color-shelf-edge: var(--shelf-edge);
+
+  --color-brand: var(--brand);
+  --color-brand-strong: var(--brand-strong);
+  --color-brand-ink: var(--brand-ink);
+
+  --color-warn-bg: var(--warn-bg);
+  --color-warn-text: var(--warn-text);
+  --color-danger: var(--danger);
+
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  /* 책 이름 전용 — 둥근 느낌. 본문에는 쓰지 않는다 */
+  --font-round: var(--font-jua), var(--font-geist-sans), system-ui, sans-serif;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
+  background-color: var(--background);
+  color: var(--text);
 
   /*
     위 @theme inline이 정해둔 글꼴을 쓴다.

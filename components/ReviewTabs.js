@@ -29,7 +29,7 @@ export default function ReviewTabs() {
       <div
         role="tablist"
         aria-label="돌아보기 화면"
-        className="mb-4 flex gap-1 rounded-full bg-zinc-100 p-1 dark:bg-zinc-900"
+        className="mb-4 flex gap-1 rounded-full bg-surface-soft p-1"
       >
         {TABS.map((item) => (
           <button
@@ -40,8 +40,8 @@ export default function ReviewTabs() {
             onClick={() => setTab(item.key)}
             className={`flex-1 rounded-full px-3 py-2 text-sm transition-colors ${
               tab === item.key
-                ? 'bg-white font-semibold text-black shadow-sm dark:bg-black dark:text-zinc-50'
-                : 'text-zinc-500 dark:text-zinc-400'
+                ? 'bg-surface font-semibold text-ink shadow-sm'
+                : 'text-muted'
             }`}
           >
             {item.label}

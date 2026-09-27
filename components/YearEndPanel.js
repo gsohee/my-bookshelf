@@ -26,13 +26,13 @@ import {
 /** 숫자 하나를 크게 보여주는 칸. */
 function Figure({ label, value, note }) {
   return (
-    <div className="rounded-xl border border-black/10 px-4 py-3 dark:border-white/15">
-      <p className="text-xs text-zinc-500 dark:text-zinc-400">{label}</p>
-      <p className="mt-1 text-xl font-semibold tracking-tight text-black dark:text-zinc-50">
+    <div className="rounded-xl border border-line-soft px-4 py-3">
+      <p className="text-xs text-muted">{label}</p>
+      <p className="mt-1 text-xl font-semibold tracking-tight text-ink">
         {value}
       </p>
       {note && (
-        <p className="mt-0.5 text-xs text-zinc-400 dark:text-zinc-500">{note}</p>
+        <p className="mt-0.5 text-xs text-faint">{note}</p>
       )}
     </div>
   );
@@ -90,7 +90,7 @@ export default function YearEndPanel() {
           id="yearEndYear"
           value={year}
           onChange={(event) => setPicked(Number(event.target.value))}
-          className="rounded-full border border-black/15 bg-white px-3 py-1.5 text-xs font-medium text-zinc-700 outline-none focus:border-black dark:border-white/20 dark:bg-black dark:text-zinc-300"
+          className="rounded-full border border-line bg-surface px-3 py-1.5 text-xs font-medium text-muted outline-none focus:border-brand"
         >
           {years.map((item) => (
             <option key={item} value={item}>
@@ -98,7 +98,7 @@ export default function YearEndPanel() {
             </option>
           ))}
         </select>
-        <p className="text-sm font-medium text-black dark:text-zinc-50">
+        <p className="text-sm font-medium text-ink">
           {year}년의 독서
         </p>
       </div>
@@ -133,42 +133,42 @@ export default function YearEndPanel() {
       </div>
 
       {/* 가장 좋았던 책 */}
-      <section className="rounded-xl border border-black/10 p-4 dark:border-white/15">
-        <h3 className="text-sm font-medium text-black dark:text-zinc-50">
+      <section className="rounded-xl border border-line-soft p-4">
+        <h3 className="text-sm font-medium text-ink">
           가장 좋았던 책
         </h3>
         {topBook ? (
           <div className="mt-2">
             <Link
               href={`/books/${topBook.book.id}`}
-              className="text-base font-medium text-black underline-offset-4 hover:underline dark:text-zinc-50"
+              className="text-base font-medium text-ink underline-offset-4 hover:underline"
             >
               {topBook.book.title}
             </Link>
-            <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-400">
+            <p className="mt-1 text-sm text-muted">
               {[topBook.book.author, formatRating(topBook.rating)]
                 .filter(Boolean)
                 .join(' · ')}
             </p>
           </div>
         ) : (
-          <p className="mt-2 text-sm text-zinc-500 dark:text-zinc-400">
+          <p className="mt-2 text-sm text-muted">
             별점을 매긴 책이 아직 없어요.
           </p>
         )}
       </section>
 
       {/* 올해의 구절 */}
-      <section className="rounded-xl border border-black/10 p-4 dark:border-white/15">
-        <h3 className="text-sm font-medium text-black dark:text-zinc-50">
+      <section className="rounded-xl border border-line-soft p-4">
+        <h3 className="text-sm font-medium text-ink">
           {year}년의 구절
         </h3>
         {highlight ? (
           <blockquote className="mt-2">
-            <p className="whitespace-pre-wrap text-sm leading-7 text-black dark:text-zinc-50">
+            <p className="whitespace-pre-wrap text-sm leading-7 text-ink">
               “{highlight.quote.text}”
             </p>
-            <footer className="mt-2 text-xs text-zinc-500 dark:text-zinc-400">
+            <footer className="mt-2 text-xs text-muted">
               —{' '}
               <Link
                 href={`/books/${highlight.book.id}`}
@@ -180,14 +180,14 @@ export default function YearEndPanel() {
             </footer>
           </blockquote>
         ) : (
-          <p className="mt-2 text-sm text-zinc-500 dark:text-zinc-400">
+          <p className="mt-2 text-sm text-muted">
             올해 읽은 책에서 모아둔 구절이 없어요.
           </p>
         )}
       </section>
 
       {stat.excluded > 0 && (
-        <p className="text-xs text-zinc-400 dark:text-zinc-500">
+        <p className="text-xs text-faint">
           중단한 책 {stat.excluded}권은 모든 숫자에서 뺐어요.
         </p>
       )}

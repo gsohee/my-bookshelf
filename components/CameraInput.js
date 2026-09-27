@@ -30,17 +30,17 @@ import { CAMERA_STATUS } from '@/components/useCameraImage';
 import { readableSize } from '@/lib/image';
 
 const smallButton =
-  'rounded-full border border-black/15 px-4 py-2.5 text-sm text-zinc-700 dark:border-white/20 dark:text-zinc-300';
+  'rounded-full border border-line px-4 py-2.5 text-sm text-muted';
 
 /** 무언가 하고 있는 동안 보여줄 칸. */
 function BusyBox({ title, hint, actionLabel, onAction }) {
   return (
-    <div className="flex flex-col items-center justify-center gap-1 rounded-xl border-2 border-dashed border-black/15 px-4 py-7 text-center dark:border-white/20">
-      <p className="text-sm font-medium text-zinc-700 dark:text-zinc-300">
+    <div className="flex flex-col items-center justify-center gap-1 rounded-xl border-2 border-dashed border-line px-4 py-7 text-center">
+      <p className="text-sm font-medium text-muted">
         {title}
       </p>
       {hint && (
-        <p className="text-xs text-zinc-400 dark:text-zinc-500">{hint}</p>
+        <p className="text-xs text-faint">{hint}</p>
       )}
       {actionLabel && (
         <button type="button" onClick={onAction} className={`mt-3 ${smallButton}`}>
@@ -125,7 +125,7 @@ export default function CameraInput({
           onAction={onCancelRecognize}
         />
       ) : image ? (
-        <div className="rounded-xl border border-black/10 p-3 dark:border-white/15">
+        <div className="rounded-xl border border-line-soft p-3">
           {/*
             찍은 사진은 메모리에만 있는 주소(blob:)를 본다.
             next/image는 미리 크기를 아는 그림을 다루는 도구라 여기엔 맞지 않는다.
@@ -137,7 +137,7 @@ export default function CameraInput({
             className="mx-auto max-h-56 w-auto rounded-lg object-contain"
           />
 
-          <p className="mt-2 text-center text-xs text-zinc-400 dark:text-zinc-500">
+          <p className="mt-2 text-center text-xs text-faint">
             {image.originalSize > image.size
               ? `${readableSize(image.originalSize)} → ${readableSize(image.size)}로 줄였어요`
               : readableSize(image.size)}
@@ -150,7 +150,7 @@ export default function CameraInput({
             <div className="mt-3">
               <p
                 role="alert"
-                className="rounded-lg bg-amber-100 px-3 py-2 text-sm text-amber-900 dark:bg-amber-950 dark:text-amber-100"
+                className="rounded-lg bg-warn-bg px-3 py-2 text-sm text-warn-text"
               >
                 {recognizeError}
               </p>
@@ -159,7 +159,7 @@ export default function CameraInput({
                   <button
                     type="button"
                     onClick={onRetry}
-                    className="flex-1 rounded-full bg-black px-4 py-2.5 text-sm font-semibold text-white dark:bg-zinc-50 dark:text-black"
+                    className="flex-1 rounded-full bg-brand px-4 py-2.5 text-sm font-semibold text-brand-ink"
                   >
                     다시 시도
                   </button>
@@ -192,7 +192,7 @@ export default function CameraInput({
               <button
                 type="button"
                 onClick={onClear}
-                className="rounded-full border border-black/15 px-4 py-2.5 text-sm text-zinc-500 dark:border-white/20 dark:text-zinc-400"
+                className="rounded-full border border-line px-4 py-2.5 text-sm text-muted"
               >
                 지우기
               </button>
@@ -200,8 +200,8 @@ export default function CameraInput({
           )}
         </div>
       ) : (
-        <div className="flex flex-col items-center gap-3 rounded-xl border-2 border-dashed border-black/15 px-4 py-6 text-center dark:border-white/20">
-          <p className="text-sm font-medium text-zinc-700 dark:text-zinc-300">
+        <div className="flex flex-col items-center gap-3 rounded-xl border-2 border-dashed border-line px-4 py-6 text-center">
+          <p className="text-sm font-medium text-muted">
             {label}
           </p>
 
@@ -213,24 +213,32 @@ export default function CameraInput({
             <button
               type="button"
               onClick={() => cameraRef.current?.click()}
-              className="flex flex-1 items-center justify-center gap-1.5 rounded-full bg-black px-4 py-2.5 text-sm font-semibold text-white dark:bg-zinc-50 dark:text-black"
+              className="flex flex-1 items-center justify-center gap-1.5 rounded-full bg-brand px-4 py-2.5 text-sm font-semibold text-brand-ink"
             >
               <span aria-hidden="true">📷</span> 사진 찍기
             </button>
             <button
               type="button"
               onClick={() => pickRef.current?.click()}
-              className="flex flex-1 items-center justify-center gap-1.5 rounded-full border border-black/15 px-4 py-2.5 text-sm font-medium text-zinc-700 dark:border-white/20 dark:text-zinc-300"
+              className="flex flex-1 items-center justify-center gap-1.5 rounded-full border border-line px-4 py-2.5 text-sm font-medium text-muted"
             >
               <span aria-hidden="true">🖼</span> 사진 올리기
             </button>
           </div>
 
-          <p className="text-xs leading-5 text-zinc-400 dark:text-zinc-500">
+          {/*
+            "안 열림"만 적어두면 짚이지 않는다 — 실제로 겪은 증상은
+            카메라 화면은 떴는데 **검은 화면**이었다(아이폰 Chrome, iOS 카메라 권한).
+            증상을 그대로 적어야 자기 경우인지 알아본다.
+          */}
+          <p className="text-xs leading-5 text-faint">
             {hint}
             <br />
-            카메라가 열리지 않으면 <b className="font-medium">사진 올리기</b>를
-            써주세요.
+            카메라가 안 열리거나 검은 화면이면{' '}
+            <b className="font-medium">사진 올리기</b>를 써주세요.
+            <br />
+            아이폰 Chrome은 <b className="font-medium">설정 → Chrome → 카메라</b>
+            를 켜야 합니다.
           </p>
         </div>
       )}
@@ -238,7 +246,7 @@ export default function CameraInput({
       {errorMessage && (
         <p
           role="alert"
-          className="mt-2 rounded-lg bg-amber-100 px-3 py-2 text-sm text-amber-900 dark:bg-amber-950 dark:text-amber-100"
+          className="mt-2 rounded-lg bg-warn-bg px-3 py-2 text-sm text-warn-text"
         >
           {errorMessage}
         </p>
