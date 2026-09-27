@@ -1,0 +1,264 @@
+'use client';
+
+// 추천 결과
+//
+// 화면에 들어서면 곧바로 추천을 받아 온다. 감상 화면에서 "추천 받기"를 이미 눌렀으므로
+// 여기서 또 누르게 하지 않는다.
+//
+// 지키는 것 두 가지
+//   1. "AI 추천이므로 실제 도서 여부를 확인하세요"를 늘 보여준다 (PRD N1)
+//   2. 서재에 이미 있는 책은 빼고 보여준다 — 서재는 이 기기에만 있으므로
+//      서버가 아니라 여기서 거른다 (PRD 6절)
+//
+// 받은 추천은 그대로 저장되지 않는다. "읽을 책에 저장"은 사람이 누른다.
+//
+// Design Ref: §3.3⑥ 추천 결과
+// Design Ref: §4.4 흐름 3
+
+import { useEffect, useRef, useState } from 'react';
+import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import { useBooks, useHydrated } from '@/components/BookStore';
+import { useApiCall } from '@/components/useApiCall';
+import { callApi } from '@/lib/api';
+import { addToRead, getToRead, describeStorageError } from '@/lib/storage';
+import ErrorNote from '@/components/ErrorNote';
+
+/** 띄어쓰기와 대소문자를 무시하고 견주기 위해 납작하게 만든다. */
+const flatten = (s) => String(s ?? '').replace(/\s+/g, '').toLowerCase();
+
+/**
+ * 화면에 보여줄 권수. PRD N1이 3권으로 정했다.
+ * 서재에 있는 책을 뺀 다음에 세어야 늘 3권이 채워진다.
+ */
+const SHOW_COUNT = 3;
+
+export default function RecommendResult({ bookId }) {
+  const router = useRouter();
+  const books = useBooks();
+  const hydrated = useHydrated();
+  const recommend = useApiCall();
+
+  const [received, setReceived] = useState(null);
+  const [savedKeys, setSavedKeys] = useState([]);
+  const [saveError, setSaveError] = useState(null);
+
+  const book = books.find((item) => item.id === bookId);
+  const review = book?.reads?.[book.reads.length - 1]?.review ?? null;
+
+  // 같은 화면에서 두 번 부르지 않기 위한 표시.
+  //
+  // 화면을 떠날 때 다시 false로 돌려놓는 것이 중요하다.
+  // 개발 모드에서는 React가 화면을 만들었다 지웠다 다시 만드는데,
+  // 그때 첫 요청은 중단되고 이 표시만 남아 "이미 물어봤다"고 여겨
+  // 다시 부르지 않은 채 로딩에 갇히는 일이 실제로 있었다.
+  const asked = useRef(false);
+
+  // run은 바뀌지 않는 함수라 effect를 다시 돌게 하지 않는다.
+  const { run } = recommend;
+
+  useEffect(() => {
+    if (!book || asked.current) return;
+    asked.current = true;
+
+    const ask = async () => {
+      const data = await run((signal) =>
+        callApi('/api/recommend', {
+          signal,
+          // "추천 응답 10초 이내"가 성공 기준(S4)이다. 서버는 8초까지만 기다린다.
+          timeoutMs: 10000,
+          // 약속한 모양인지 여기서도 본다. Design Ref: §6
+          validate: (result) => Array.isArray(result?.books),
+          // 보내는 것은 여기 적힌 것뿐이다. 구절과 메모는 넣지 않는다. (PRD 7절)
+          body: {
+            title: book.title,
+            genre: book.genre,
+            mood: review?.mood ?? '',
+            likedPoints: review?.likedPoints ?? [],
+            difficulty: review?.difficulty ?? '',
+            rating: review?.rating ?? null,
+          },
+        }),
+      );
+      if (data) setReceived(data.books);
+    };
+
+    ask();
+
+    // 화면이 사라지면 표시를 되돌린다. 다시 들어오면 새로 물어본다.
+    return () => {
+      asked.current = false;
+    };
+  }, [book, review, run]);
+
+  // 서버에서 그리는 동안에는 저장소가 없어 서재가 비어 보인다.
+  if (!hydrated) return null;
+
+  if (!book) {
+    return (
+      <div className="flex flex-1 flex-col items-center justify-center gap-3 text-center">
+        <p className="text-sm text-zinc-500 dark:text-zinc-400">
+          그런 책을 찾지 못했어요.
+        </p>
+        <Link
+          href="/"
+          className="rounded-full border border-black/15 px-5 py-2 text-sm text-zinc-700 dark:border-white/20 dark:text-zinc-300"
+        >
+          서재로 가기
+        </Link>
+      </div>
+    );
+  }
+
+  // 서재에 이미 있는 책을 먼저 빼고, 그다음에 3권을 고른다.
+  // 순서가 반대면 고른 3권 중 하나가 서재에 있을 때 2권만 남는다.
+  const inShelf = new Set(books.map((item) => flatten(item.title)));
+  const shown = (received ?? [])
+    .filter((item) => !inShelf.has(flatten(item.title)))
+    .slice(0, SHOW_COUNT);
+
+  /** 이미 읽을 책에 담긴 것인지. 새로고침해도 알 수 있도록 저장소에서 확인한다. */
+  function alreadySaved(item) {
+    const key = flatten(item.title);
+    if (savedKeys.includes(key)) return true;
+    try {
+      return getToRead().some((saved) => flatten(saved.title) === key);
+    } catch {
+      return false;
+    }
+  }
+
+  function handleSave(item) {
+    try {
+      addToRead(item);
+      setSavedKeys((current) => [...current, flatten(item.title)]);
+      setSaveError(null);
+    } catch (error) {
+      // 원문 오류를 그대로 보여주지 않는다. Design Ref: §8 오류 처리
+      setSaveError(
+        describeStorageError(error, '저장하지 못했어요. 잠시 후 다시 해주세요.'),
+      );
+    }
+  }
+
+  function goBack() {
+    router.push(`/books/${bookId}`);
+  }
+
+  return (
+    <div className="flex flex-1 flex-col gap-4">
+      <p className="text-xs text-zinc-500 dark:text-zinc-400">
+        『{book.title}』을(를) 읽은 뒤에 어울리는 책이에요
+      </p>
+
+      {/*
+        PRD N1이 못박은 문구. 추천이 나오든 안 나오든 늘 보인다.
+        AI가 없는 책을 지어낼 수 있기 때문이다.
+      */}
+      <p className="rounded-lg bg-amber-50 px-3 py-2.5 text-xs leading-5 text-amber-900 dark:bg-amber-950/50 dark:text-amber-200">
+        ⚠ AI 추천이므로 실제 도서 여부를 확인하세요.
+      </p>
+
+      {recommend.loading && (
+        <div className="flex flex-1 flex-col items-center justify-center gap-1 text-center">
+          <p className="text-sm font-medium text-zinc-700 dark:text-zinc-300">
+            어울리는 책을 찾는 중…
+          </p>
+          <p className="text-xs text-zinc-400 dark:text-zinc-500">몇 초 걸려요</p>
+        </div>
+      )}
+
+      {!recommend.loading && recommend.errorMessage && (
+        <div className="flex flex-1 flex-col items-center justify-center gap-3 text-center">
+          <p
+            role="alert"
+            className="rounded-lg bg-amber-100 px-3 py-2 text-sm text-amber-900 dark:bg-amber-950 dark:text-amber-100"
+          >
+            {recommend.errorMessage}
+          </p>
+          <div className="flex gap-2">
+            {recommend.canRetry && (
+              <button
+                type="button"
+                onClick={() => {
+                  recommend.retry().then((data) => {
+                    if (data) setReceived(data.books);
+                  });
+                }}
+                className="rounded-full bg-black px-5 py-2.5 text-sm font-semibold text-white dark:bg-zinc-50 dark:text-black"
+              >
+                다시 시도
+              </button>
+            )}
+            <button
+              type="button"
+              onClick={goBack}
+              className="rounded-full border border-black/15 px-5 py-2.5 text-sm text-zinc-700 dark:border-white/20 dark:text-zinc-300"
+            >
+              건너뛰기
+            </button>
+          </div>
+        </div>
+      )}
+
+      {!recommend.loading && !recommend.errorMessage && received !== null && (
+        <>
+          {shown.length === 0 ? (
+            <div className="flex flex-1 flex-col items-center justify-center gap-2 text-center">
+              <p className="text-sm text-zinc-500 dark:text-zinc-400">
+                권해줄 만한 새 책을 찾지 못했어요.
+              </p>
+              <p className="text-xs text-zinc-400 dark:text-zinc-500">
+                추천된 책이 이미 서재에 있을 수 있어요.
+              </p>
+            </div>
+          ) : (
+            <ul className="flex flex-col gap-3">
+              {shown.map((item) => {
+                const saved = alreadySaved(item);
+                return (
+                  <li
+                    key={`${item.title}|${item.author}`}
+                    className="rounded-xl border border-black/10 p-3 dark:border-white/15"
+                  >
+                    <p className="text-sm font-semibold text-black dark:text-zinc-50">
+                      {item.title}
+                    </p>
+                    <p className="mt-0.5 text-xs text-zinc-500 dark:text-zinc-400">
+                      {item.author}
+                    </p>
+                    {item.reason && (
+                      <p className="mt-2 text-sm leading-6 text-zinc-600 dark:text-zinc-400">
+                        {item.reason}
+                      </p>
+                    )}
+                    <div className="mt-3 flex justify-end">
+                      <button
+                        type="button"
+                        onClick={() => handleSave(item)}
+                        disabled={saved}
+                        className="rounded-full border border-black/15 px-4 py-2 text-sm text-zinc-700 disabled:border-transparent disabled:bg-zinc-100 disabled:text-zinc-400 dark:border-white/20 dark:text-zinc-300 dark:disabled:bg-zinc-900 dark:disabled:text-zinc-600"
+                      >
+                        {saved ? '저장됨' : '읽을 책에 저장'}
+                      </button>
+                    </div>
+                  </li>
+                );
+              })}
+            </ul>
+          )}
+
+          <ErrorNote message={saveError?.message} code={saveError?.code} />
+
+          <button
+            type="button"
+            onClick={goBack}
+            className="mt-auto w-full rounded-full border border-black/15 px-4 py-3 text-sm text-zinc-700 dark:border-white/20 dark:text-zinc-300"
+          >
+            책으로 돌아가기
+          </button>
+        </>
+      )}
+    </div>
+  );
+}

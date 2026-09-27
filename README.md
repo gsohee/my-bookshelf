@@ -1,36 +1,111 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# 나의 책장
 
-## Getting Started
+책을 찍으면 서재에 꽂히는 **개인 독서기록 웹앱**입니다.
+기록은 전부 내 브라우저 안에만 남고, 사진은 한 장도 저장하지 않습니다.
 
-First, run the development server:
+---
+
+## 무엇을 하는 앱인가
+
+책 기록은 입력이 번거로워 끊기고, 읽은 책이 한눈에 보이지 않아 "내 서재"라는 실감이 없습니다.
+이 앱은 **촬영 → 자동 인식 → 내가 확인**의 세 단계로 입력을 줄이고,
+책등 카드로 쌓인 책을 눈에 보이게 합니다.
+
+혼자 쓰는 앱입니다. **로그인도 회원가입도 없습니다.**
+
+## 할 수 있는 것
+
+| | |
+|---|---|
+| 📷 **표지 찍어 등록** | 표지를 찍으면 제목·지은이를 읽어 입력칸을 채웁니다 |
+| 📚 **책등 서재** | 장르별 색, 세로 제목, 총 페이지에 비례한 두께. 정렬은 버튼 한 번 |
+| ✍️ **구절 모으기** | 페이지를 찍으면 본문과 쪽 번호를 읽어옵니다. 태그로 모아볼 수 있습니다 |
+| ⭐ **완독 감상** | 분위기·좋았던 점·난이도·별점(0.5 단위)을 버튼으로 고릅니다 |
+| 🤖 **다음 책 추천** | 완독 감상을 바탕으로 3권을 추천받아 "읽을 책"에 담습니다 |
+| 📊 **돌아보기** | 연도별·월별·장르·분위기 통계, 달력, 연말 결산, 연간 목표 |
+| 💾 **내 기록 지키기** | JSON 백업·복원, CSV·마크다운 내보내기 |
+
+## 약속한 것
+
+- **사진을 저장하지 않습니다.** 찍은 사진은 인식 응답을 받을 때까지만 메모리에 있다가 바로 버려집니다.
+  localStorage·IndexedDB·서버 어디에도 남지 않습니다.
+- **API 키가 브라우저로 내려가지 않습니다.** OpenAI 호출은 서버 Route Handler 안에서만 일어납니다.
+- **AI가 읽은 결과를 자동 저장하지 않습니다.** 입력칸을 채워줄 뿐, 저장은 항상 사람이 누릅니다.
+- **서버 DB가 없습니다.** 기록은 쓰는 사람의 브라우저에만 있습니다.
+- **구절 본문과 메모를 추천 요청에 보내지 않습니다.** 감상 선택 항목과 제목·장르만 나갑니다.
+
+> 기록이 브라우저에만 있다는 것은 **브라우저 저장소를 지우면 사라진다**는 뜻이기도 합니다.
+> `데이터` 화면에서 가끔 백업 파일을 받아두세요.
+
+## 만든 기술
+
+| 항목 | 선택 |
+|---|---|
+| 프레임워크 | Next.js 16 (App Router) · JavaScript |
+| UI | React 19 · Tailwind CSS v4 |
+| 그래프 | Recharts |
+| 이미지 축소 | browser-image-compression (전송 전, 메모리에서만 · EXIF 제거) |
+| 인식·추천 | OpenAI API (서버에서만 호출) |
+| 저장 | 브라우저 localStorage |
+| 배포 | Vercel |
+
+기준 화면 폭은 **380px**입니다. 휴대폰에서 쓰는 것을 먼저 생각해 만들었습니다.
+
+## 직접 돌려보기
 
 ```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+http://localhost:3000 을 엽니다.
 
-You can start editing the page by modifying `app/page.js`. The page auto-updates as you edit the file.
+**촬영 인식과 추천을 쓰려면** 프로젝트 루트에 `.env` 파일을 만들고 OpenAI 키를 넣습니다.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```bash
+# .env  (이 파일은 .gitignore에 있어 커밋되지 않습니다)
+OPENAI_API_KEY=여기에-본인-키
+```
 
-## Learn More
+키가 없어도 앱은 뜹니다. 촬영 대신 **직접 입력**으로 모든 기능을 쓸 수 있습니다.
 
-To learn more about Next.js, take a look at the following resources:
+| 환경변수 | 필수 | 없으면 |
+|---|:-:|---|
+| `OPENAI_API_KEY` | — | 인식·추천만 실패합니다 |
+| `OPENAI_MODEL` | | `gpt-4.1-mini` |
+| `OPENAI_VISION_MODEL` | | `OPENAI_MODEL`과 같은 값 |
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+### 그 밖의 명령어
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+```bash
+npm run lint     # ESLint (Next.js 16부터 build에 포함되지 않습니다)
+npm run build    # 프로덕션 빌드
+npm run start    # 빌드 결과 실행
+```
 
-## Deploy on Vercel
+## 폴더 구조
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+```
+app/          화면과 서버 API (Route Handler 3개)
+components/   화면 조각 — 책등 카드, 촬영 입력, 통계 패널 등
+lib/          데이터와 계산
+  storage.js    localStorage로 드나드는 유일한 통로
+  stats.js      숫자를 세는 유일한 곳 (중단한 책 분리)
+  migrate.js    저장 구조 버전 변환
+```
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+두 가지 원칙으로 묶었습니다 — **저장소는 한 문**, **계산은 한 곳**.
+같은 일을 두 곳에서 하면 한쪽만 고치는 실수가 생기기 때문입니다.
+
+## 함께 있는 문서
+
+| 파일 | 내용 |
+|---|---|
+| [`PRD.md`](PRD.md) | 무엇을 왜 만드는가 |
+| [`PLAN.md`](PLAN.md) | 작업 42개의 순서와 성공 기준 |
+| [`DESIGN.md`](DESIGN.md) | 화면·데이터 흐름·기술 선택 |
+| [`CLAUDE.md`](CLAUDE.md) | 이 저장소에서 코드를 쓸 때의 규칙 |
+
+## 라이선스
+
+개인 학습·사용 목적으로 만든 프로젝트입니다.

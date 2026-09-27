@@ -22,5 +22,19 @@
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+
+  /*
+    위 @theme inline이 정해둔 글꼴을 쓴다.
+    create-next-app이 넣어준 기본값은 Arial을 강제해서,
+    layout.js가 불러온 Geist를 쓰지 못하고 있었다. (작업 25에서 잡음)
+  */
+  font-family: var(--font-sans), system-ui, sans-serif;
+
+  /*
+    공백 없이 아주 긴 글자가 와도 줄을 바꿔 칸 밖으로 넘치지 않게 한다.
+    영문 제목, 붙여 쓴 긴 말, 주소 같은 것이 여기 해당한다.
+    폭 380px에서 화면이 깨지면 안 되므로 앱 전체에 건다. (CLAUDE.md 8절)
+    책등 세로 제목처럼 일부러 한 줄로 두는 곳은 whitespace-nowrap이라 영향받지 않는다.
+  */
+  overflow-wrap: break-word;
 }

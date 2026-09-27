@@ -39,3 +39,9 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# trash-can (삭제 대기 파일 보관소 - 커밋하지 않음)
+/trash-can/
+
+# bkit 도구가 남기는 로컬 기록 (감사 로그·토큰 집계) — 공개 저장소에 올릴 내용이 아님
+/.bkit/
