@@ -171,6 +171,15 @@ export default function ReviewForm({ bookId }) {
   // 이미 적어둔 감상이 있으면 그 값에서 시작한다. 고치러 다시 올 수 있기 때문이다.
   // 화면을 그린 뒤에 값을 넣는 방식은 쓰지 않는다 — 첫 렌더에 한 번만 옮겨 담는다.
   const saved = book.reads?.[book.reads.length - 1]?.review;
+
+  /**
+   * 처음 적으러 온 것인가, 고치러 온 것인가.
+   *
+   * 이 둘은 하려는 일이 다르다. 처음에는 추천까지 이어 가는 것이 흐름이지만,
+   * 고치러 온 사람은 **고친 것을 담아두고 책으로 돌아가고 싶어 한다.**
+   * 예전에는 버튼이 「추천 받기」와 「나중에」뿐이라, 고쳐놓고도 담을 길이 없었다.
+   */
+  const isEditing = Boolean(saved);
   if (!ready) {
     if (saved) {
       setMood(saved.mood ?? null);
@@ -191,8 +200,12 @@ export default function ReviewForm({ bookId }) {
     );
   }
 
-  function handleSubmit(event) {
-    event.preventDefault();
+  /**
+   * 감상을 담고 다음 화면으로 넘어간다.
+   *
+   * @param goTo 'result' 추천 결과로 / 'book' 책 화면으로 되돌아가기
+   */
+  function save(goTo) {
     if (saving) return;
 
     setSaving(true);
@@ -201,8 +214,11 @@ export default function ReviewForm({ bookId }) {
     try {
       saveReview(bookId, { mood, likedPoints, difficulty, rating, memo });
       notifyBooksChanged();
-      // 감상을 담고 나서 추천 결과 화면으로 넘어간다. Design Ref: §4.4 흐름 3
-      router.push(`/books/${bookId}/finish/result`);
+      router.push(
+        goTo === 'result'
+          ? `/books/${bookId}/finish/result`
+          : `/books/${bookId}`,
+      );
     } catch (error) {
       setSaving(false);
       // 원문 오류를 그대로 보여주지 않는다. Design Ref: §8 오류 처리
@@ -212,10 +228,23 @@ export default function ReviewForm({ bookId }) {
     }
   }
 
+  /**
+   * 엔터를 눌렀을 때 일어날 일.
+   *
+   * 처음 적을 때는 추천까지 가는 것이 정해둔 흐름이고(Design Ref: §4.4 흐름 3),
+   * 고치러 온 사람은 담아두고 책으로 돌아가고 싶어 한다.
+   */
+  function handleSubmit(event) {
+    event.preventDefault();
+    save(isEditing ? 'book' : 'result');
+  }
+
   return (
     <form onSubmit={handleSubmit} className="flex flex-1 flex-col gap-6">
       <p className="text-xs text-muted">
-        『{book.title}』을(를) 다 읽었어요
+        {isEditing
+          ? `『${book.title}』에 남긴 감상`
+          : `『${book.title}』을(를) 다 읽었어요`}
       </p>
 
       <fieldset>
@@ -290,20 +319,41 @@ export default function ReviewForm({ bookId }) {
 
       <ErrorNote message={saveError?.message} code={saveError?.code} />
 
-      <div className="mt-auto flex gap-2 pt-2">
-        <button
-          type="submit"
-          disabled={saving}
-          className="flex-1 rounded-full bg-brand px-4 py-3 text-sm font-semibold text-brand-ink disabled:bg-line disabled:text-muted"
-        >
-          {saving ? '저장하는 중…' : '추천 받기'}
-        </button>
+      {/*
+        버튼은 셋이다. 고치러 온 사람과 처음 적는 사람이 바라는 것이 달라
+        무엇을 앞에 둘지만 바뀐다.
+
+          처음   [추천 받기]  [나중에]  +  [저장만 하기]
+          고칠 때 [저장]      [취소]    +  [저장하고 추천 받기]
+
+        어느 쪽이든 **담는 길이 반드시 있다.** 예전에는 고치러 오면
+        「추천 받기」로 빠져나가거나 고친 것을 버리는 수밖에 없었다.
+      */}
+      <div className="mt-auto flex flex-col gap-2 pt-2">
+        <div className="flex gap-2">
+          <button
+            type="submit"
+            disabled={saving}
+            className="flex-1 rounded-full bg-brand px-4 py-3 text-sm font-semibold text-brand-ink disabled:bg-line disabled:text-muted"
+          >
+            {saving ? '저장하는 중…' : isEditing ? '저장' : '추천 받기'}
+          </button>
+          <button
+            type="button"
+            onClick={() => router.push(`/books/${bookId}`)}
+            className="rounded-full border border-line px-6 py-3 text-sm text-muted"
+          >
+            {isEditing ? '취소' : '나중에'}
+          </button>
+        </div>
+
         <button
           type="button"
-          onClick={() => router.push(`/books/${bookId}`)}
-          className="rounded-full border border-line px-6 py-3 text-sm text-muted"
+          disabled={saving}
+          onClick={() => save(isEditing ? 'result' : 'book')}
+          className="w-full rounded-full border border-line px-4 py-3 text-sm text-muted disabled:text-faint"
         >
-          나중에
+          {isEditing ? '저장하고 추천 받기' : '저장만 하기'}
         </button>
       </div>
     </form>
