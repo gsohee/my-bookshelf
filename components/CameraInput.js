@@ -1,15 +1,23 @@
 'use client';
 
-// 촬영 입력과 미리보기
+// 사진 넣기와 미리보기
 //
-// 휴대폰에서는 누르면 바로 뒷면 카메라가 열리고, PC에서는 파일 고르기 창이 열린다.
-// capture="environment"가 그 역할을 한다.
+// ── 길이 둘이다 ──────────────────────────────────────
+//
+//   📷 사진 찍기   — capture="environment". 휴대폰에서 뒷면 카메라가 바로 열린다
+//   🖼 사진 올리기  — capture 없음. 갤러리·파일에서 이미 있는 사진을 고른다
+//
+// **입력칸을 둘로 나눈 이유**: `capture`가 붙은 입력칸 하나만 두면 휴대폰에서
+// 카메라만 열리고 **갤러리에서 고르는 선택지가 사라진다.** 카메라 권한이 막혀 있으면
+// 눌러도 아무 일이 일어나지 않아 "고장난 버튼"이 된다.
+// 같은 입력칸에서 capture를 켰다 껐다 할 수는 없어서(브라우저가 처음 값만 본다)
+// 숨은 입력칸을 두 개 두고 버튼으로 골라 연다.
 //
 // 보여주는 차례
 //   1. 사진을 줄이는 중   (작업 7)
 //   2. 표지를 읽는 중      (작업 10) — 취소할 수 있다
 //   3. 사진이 있음         — 읽기에 실패했으면 "다시 시도 / 직접 입력"
-//   4. 아무것도 없음       — 촬영 버튼
+//   4. 아무것도 없음       — 사진 찍기 · 사진 올리기
 //
 // 읽기에 성공하면 사진은 그 자리에서 버려지므로(Design Ref: §4.2 5단계)
 // 다시 4번으로 돌아간다. 채워진 입력칸이 결과를 보여준다.
@@ -61,7 +69,9 @@ export default function CameraInput({
   errorMessage,
 }) {
   const inputId = useId();
-  const inputRef = useRef(null);
+  // 찍기용과 올리기용을 따로 둔다. 하나로는 둘 다 못 한다 (위 설명 참고)
+  const cameraRef = useRef(null);
+  const pickRef = useRef(null);
   const shrinking = status === CAMERA_STATUS.SHRINKING;
 
   function handleChange(event) {
@@ -83,13 +93,24 @@ export default function CameraInput({
 
   return (
     <div>
-      {/* 실제 입력칸은 감춰두고 아래 버튼으로 연다 */}
+      {/*
+        실제 입력칸은 감춰두고 아래 버튼으로 연다.
+        capture가 붙은 것과 안 붙은 것, 둘을 따로 둔다.
+      */}
       <input
-        ref={inputRef}
-        id={inputId}
+        ref={cameraRef}
+        id={`${inputId}-camera`}
         type="file"
         accept="image/*"
         capture="environment"
+        onChange={handleChange}
+        className="sr-only"
+      />
+      <input
+        ref={pickRef}
+        id={`${inputId}-pick`}
+        type="file"
+        accept="image/*"
         onChange={handleChange}
         className="sr-only"
       />
@@ -156,15 +177,22 @@ export default function CameraInput({
             <div className="mt-3 flex gap-2">
               <button
                 type="button"
-                onClick={() => inputRef.current?.click()}
+                onClick={() => cameraRef.current?.click()}
                 className={`flex-1 ${smallButton}`}
               >
                 다시 찍기
               </button>
               <button
                 type="button"
+                onClick={() => pickRef.current?.click()}
+                className={`flex-1 ${smallButton}`}
+              >
+                다른 사진
+              </button>
+              <button
+                type="button"
                 onClick={onClear}
-                className="rounded-full border border-black/15 px-5 py-2.5 text-sm text-zinc-500 dark:border-white/20 dark:text-zinc-400"
+                className="rounded-full border border-black/15 px-4 py-2.5 text-sm text-zinc-500 dark:border-white/20 dark:text-zinc-400"
               >
                 지우기
               </button>
@@ -172,22 +200,39 @@ export default function CameraInput({
           )}
         </div>
       ) : (
-        <label
-          htmlFor={inputId}
-          className="flex cursor-pointer flex-col items-center justify-center gap-1 rounded-xl border-2 border-dashed border-black/15 px-4 py-7 text-center transition-colors hover:border-black/40 dark:border-white/20 dark:hover:border-white/40"
-        >
-          <span aria-hidden="true" className="text-2xl">
-            📷
-          </span>
-          <span className="text-sm font-medium text-zinc-700 dark:text-zinc-300">
+        <div className="flex flex-col items-center gap-3 rounded-xl border-2 border-dashed border-black/15 px-4 py-6 text-center dark:border-white/20">
+          <p className="text-sm font-medium text-zinc-700 dark:text-zinc-300">
             {label}
-          </span>
-          {hint && (
-            <span className="text-xs text-zinc-400 dark:text-zinc-500">
-              {hint}
-            </span>
-          )}
-        </label>
+          </p>
+
+          {/*
+            두 길을 나란히 둔다. 카메라가 막힌 기기에서도 오른쪽으로 갈 수 있어야
+            "버튼이 고장났다"가 되지 않는다.
+          */}
+          <div className="flex w-full gap-2">
+            <button
+              type="button"
+              onClick={() => cameraRef.current?.click()}
+              className="flex flex-1 items-center justify-center gap-1.5 rounded-full bg-black px-4 py-2.5 text-sm font-semibold text-white dark:bg-zinc-50 dark:text-black"
+            >
+              <span aria-hidden="true">📷</span> 사진 찍기
+            </button>
+            <button
+              type="button"
+              onClick={() => pickRef.current?.click()}
+              className="flex flex-1 items-center justify-center gap-1.5 rounded-full border border-black/15 px-4 py-2.5 text-sm font-medium text-zinc-700 dark:border-white/20 dark:text-zinc-300"
+            >
+              <span aria-hidden="true">🖼</span> 사진 올리기
+            </button>
+          </div>
+
+          <p className="text-xs leading-5 text-zinc-400 dark:text-zinc-500">
+            {hint}
+            <br />
+            카메라가 열리지 않으면 <b className="font-medium">사진 올리기</b>를
+            써주세요.
+          </p>
+        </div>
       )}
 
       {errorMessage && (

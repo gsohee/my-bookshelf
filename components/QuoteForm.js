@@ -230,7 +230,7 @@ export default function QuoteForm({ bookId, quote = null, onDone }) {
             고칠 때는 이미 담은 글을 손보는 일이라 촬영이 필요 없다.
           */}
           <CameraInput
-            label="페이지 찍기"
+            label="책 페이지 사진으로 채우기"
             hint="찍은 사진은 저장하지 않아요"
             image={photo.image}
             status={photo.status}

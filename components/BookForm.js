@@ -264,7 +264,7 @@ export default function BookForm({
       {!isEditing && (
         <>
           <CameraInput
-            label="표지 찍기"
+            label="책 표지 사진으로 채우기"
             hint="찍은 사진은 저장하지 않아요"
             image={cover.image}
             status={cover.status}
